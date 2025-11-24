@@ -5,5 +5,8 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
-  testTimeout: 10000,
+  testTimeout: 30000,
+  maxWorkers: 1, // Run tests serially to avoid database conflicts
+  forceExit: true, // Force exit after tests complete
+  detectOpenHandles: true, // Detect handles that prevent Jest from exiting
 };

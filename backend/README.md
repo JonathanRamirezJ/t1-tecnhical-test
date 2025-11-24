@@ -43,7 +43,7 @@ Edit `.env` with your configurations:
 
 ```env
 PORT=5000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/t1-tracking?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/t1_technical_test?retryWrites=true&w=majority
 JWT_SECRET=tu_jwt_secret_muy_seguro_aqui
 JWT_EXPIRES_IN=7d
 NODE_ENV=development

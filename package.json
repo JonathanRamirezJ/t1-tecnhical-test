@@ -9,6 +9,8 @@
     "dev": "concurrently \"npm:dev:front\" \"npm:dev:back\"",
     "dev:front": "npm --workspace frontend run dev",
     "dev:back": "npm --workspace backend run dev",
+    "test:front": "npm --workspace frontend run test",
+    "test:back": "npm --workspace backend run test",
     "test": "concurrently \"npm --workspace frontend run test\" \"npm --workspace backend run test\"",
     "test:watch": "concurrently \"npm --workspace frontend run test:watch\" \"npm --workspace backend run test:watch\"",
     "test:coverage": "concurrently \"npm --workspace frontend run test:coverage\" \"npm --workspace backend run test:coverage\"",
