@@ -1,43 +1,29 @@
 'use client';
 
-/* Pages*/
-import { ButtonsDemo } from './pages/ButtonsDemo/ButtonsDemo.page';
-import { InputsDemo } from './pages/InputsDemo/InputsDemo.page';
-import { ModalDemo } from './pages/ModalDemo/ModalDemo.page';
-import { CardDemo } from './pages/CardDemo/CardDemo.page';
-import { FormDemo } from './pages/FormDemo/FormDemo.page';
-
-/* Components */
-import { Header } from './components/Header/Header.component';
-import { Footer } from './components/Footer/Footer.component';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from './contexts/AuthContext';
 
 export default function Home() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (isAuthenticated) {
+        router.push('/dashboard');
+      } else {
+        router.push('/login');
+      }
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Mostrar loading mientras se determina la redirección
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <Header />
-
-        {/* Componentes Demo */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Button Examples */}
-          <ButtonsDemo />
-
-          {/* Input Examples */}
-          <InputsDemo />
-
-          {/* Modal Example */}
-          <ModalDemo />
-
-          {/* Card Examples */}
-          <CardDemo />
-        </div>
-
-        {/* Form Example */}
-        <FormDemo />
-
-        {/* Footer */}
-        <Footer />
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Cargando...</p>
       </div>
     </div>
   );
