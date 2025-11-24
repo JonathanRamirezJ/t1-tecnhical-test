@@ -83,7 +83,27 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     `.replace(/\s+/g, ' ').trim();
 
     const renderIcon = () => {
-      // Icono de toggle para contraseña
+      // Prioridad: Error > Success > Toggle de contraseña
+      
+      // Icono de error (máxima prioridad)
+      if (currentVariant === 'error') {
+        return (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+          </div>
+        );
+      }
+      
+      // Icono de éxito (segunda prioridad)
+      if (currentVariant === 'success') {
+        return (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <CheckCircleIcon className="h-5 w-5 text-green-500" />
+          </div>
+        );
+      }
+      
+      // Icono de toggle para contraseña (menor prioridad)
       if (type === 'password') {
         return (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -99,24 +119,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 <EyeIcon className="h-5 w-5" />
               )}
             </button>
-          </div>
-        );
-      }
-      
-      // Icono de error
-      if (currentVariant === 'error') {
-        return (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
-          </div>
-        );
-      }
-      
-      // Icono de éxito
-      if (currentVariant === 'success') {
-        return (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <CheckCircleIcon className="h-5 w-5 text-green-500" />
           </div>
         );
       }

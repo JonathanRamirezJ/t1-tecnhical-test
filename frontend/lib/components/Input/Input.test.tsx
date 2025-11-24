@@ -1,10 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Input from './Input';
 
 describe('Input', () => {
-  // Test 1: Renderizado básico
+  // Test 1: Basic render
   it('renders correctly with default props', () => {
     render(<Input />);
     const input = screen.getByRole('textbox');
@@ -12,7 +12,7 @@ describe('Input', () => {
     expect(input).toHaveAttribute('type', 'text');
   });
 
-  // Test 2: Tipos de input
+  // Test 2: Input types
   it('renders different input types correctly', () => {
     const { rerender } = render(<Input type="text" />);
     expect(screen.getByRole('textbox')).toHaveAttribute('type', 'text');
@@ -25,7 +25,7 @@ describe('Input', () => {
     expect(passwordInput).toHaveAttribute('type', 'password');
   });
 
-  // Test 3: Label y required
+  // Test 3: Label and required
   it('renders label and required indicator correctly', () => {
     render(<Input label="Email" required />);
     
@@ -44,15 +44,15 @@ describe('Input', () => {
     expect(input).toBeInTheDocument();
   });
 
-  // Test 5: Estado disabled
+  // Test 5: Disabled state
   it('handles disabled state correctly', () => {
     render(<Input disabled />);
     const input = screen.getByRole('textbox');
     expect(input).toBeDisabled();
-    expect(input).toHaveClass('opacity-50', 'cursor-not-allowed');
+    expect(input).toHaveClass('disabled:opacity-50', 'disabled:cursor-not-allowed');
   });
 
-  // Test 6: Estados de validación - Error
+  // Test 6: Error state
   it('handles error state correctly', () => {
     render(<Input error="This field is required" />);
     
@@ -63,12 +63,13 @@ describe('Input', () => {
     expect(errorMessage).toBeInTheDocument();
     expect(errorMessage).toHaveClass('text-red-600');
     
-    // Verificar icono de error
-    const errorIcon = input.parentElement?.querySelector('svg');
+    // Verify error icon (Heroicons)
+    const container = input.parentElement;
+    const errorIcon = container?.querySelector('[data-testid="ExclamationCircleIcon"], svg');
     expect(errorIcon).toBeInTheDocument();
   });
 
-  // Test 7: Estados de validación - Success
+  // Test 7: Success state
   it('handles success state correctly', () => {
     render(<Input success="Valid email address" />);
     
@@ -79,8 +80,9 @@ describe('Input', () => {
     expect(successMessage).toBeInTheDocument();
     expect(successMessage).toHaveClass('text-green-600');
     
-    // Verificar icono de success
-    const successIcon = input.parentElement?.querySelector('svg');
+    // Verify success icon (Heroicons)
+    const container = input.parentElement;
+    const successIcon = container?.querySelector('[data-testid="CheckCircleIcon"], svg');
     expect(successIcon).toBeInTheDocument();
   });
 
@@ -93,7 +95,7 @@ describe('Input', () => {
     expect(helperText).toHaveClass('text-gray-500');
   });
 
-  // Test 9: Tamaños
+  // Test 9: Sizes
   it('renders different sizes correctly', () => {
     const { rerender } = render(<Input size="sm" />);
     expect(screen.getByRole('textbox')).toHaveClass('px-3', 'py-1.5', 'text-sm');
@@ -105,7 +107,7 @@ describe('Input', () => {
     expect(screen.getByRole('textbox')).toHaveClass('px-4', 'py-3', 'text-lg');
   });
 
-  // Test 10: Interacciones - onChange
+  // Test 10: onChange events
   it('handles change events correctly', async () => {
     const handleChange = jest.fn();
     const user = userEvent.setup();
@@ -134,22 +136,26 @@ describe('Input', () => {
     expect(handleBlur).toHaveBeenCalledTimes(1);
   });
 
-  // Test 12: ID único
+  // Test 12: Unique ID
   it('generates unique ID when not provided', () => {
-    const { rerender } = render(<Input label="First" />);
-    const firstInput = screen.getByRole('textbox');
-    const firstId = firstInput.getAttribute('id');
+    render(
+      <div>
+        <Input label="First" />
+        <Input label="Second" />
+      </div>
+    );
     
-    rerender(<Input label="Second" />);
-    const secondInput = screen.getByRole('textbox');
-    const secondId = secondInput.getAttribute('id');
+    const inputs = screen.getAllByRole('textbox');
+    const firstId = inputs[0].getAttribute('id');
+    const secondId = inputs[1].getAttribute('id');
     
     expect(firstId).toBeTruthy();
     expect(secondId).toBeTruthy();
+    // IDs must be different when components are separated
     expect(firstId).not.toBe(secondId);
   });
 
-  // Test 13: ID personalizado
+  // Test 13: Custom ID
   it('uses custom ID when provided', () => {
     render(<Input id="custom-input" label="Custom" />);
     const input = screen.getByRole('textbox');
@@ -159,7 +165,7 @@ describe('Input', () => {
     expect(label).toHaveAttribute('for', 'custom-input');
   });
 
-  // Test 14: Prioridad de mensajes (error > success > helper)
+  // Test 14: Prioritizes error over success and helper text
   it('prioritizes error over success and helper text', () => {
     render(
       <Input 
@@ -174,7 +180,7 @@ describe('Input', () => {
     expect(screen.queryByText('Helper text')).not.toBeInTheDocument();
   });
 
-  // Test 15: Success sobre helper text
+  // Test 15: Prioritizes success over helper text when no error
   it('prioritizes success over helper text when no error', () => {
     render(
       <Input 
@@ -196,7 +202,7 @@ describe('Input', () => {
     expect(ref.current).toBe(screen.getByRole('textbox'));
   });
 
-  // Test 17: Props HTML nativas
+  // Test 17: HTML attributes
   it('forwards HTML attributes correctly', () => {
     render(
       <Input 
@@ -211,10 +217,96 @@ describe('Input', () => {
     expect(input).toHaveAttribute('maxLength', '50');
   });
 
-  // Test 18: Clases CSS personalizadas
+  // Test 18: Custom classes
   it('applies custom className correctly', () => {
     render(<Input className="custom-class" />);
     const input = screen.getByRole('textbox');
     expect(input).toHaveClass('custom-class');
+  });
+
+  // Test 19: Password toggle button
+  it('renders password toggle button for password input', () => {
+    render(<Input type="password" />);
+    
+    const passwordInput = document.querySelector('input[type="password"]');
+    expect(passwordInput).toBeInTheDocument();
+    
+    // Verify that the toggle button exists
+    const toggleButton = screen.getByRole('button');
+    expect(toggleButton).toBeInTheDocument();
+    expect(toggleButton).toHaveAttribute('type', 'button');
+    
+    // Verify eye icon (EyeIcon by default)
+    const container = passwordInput?.parentElement;
+    const eyeIcon = container?.querySelector('svg');
+    expect(eyeIcon).toBeInTheDocument();
+  });
+
+  // Test 20: Password toggle functionality
+  it('toggles password visibility when button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<Input type="password" value="secretpassword" readOnly />);
+    
+    const passwordInput = document.querySelector('input') as HTMLInputElement;
+    const toggleButton = screen.getByRole('button');
+    
+    // Initially should be type password
+    expect(passwordInput).toHaveAttribute('type', 'password');
+    
+    // Click to show password
+    await user.click(toggleButton);
+    expect(passwordInput).toHaveAttribute('type', 'text');
+    
+    // Click to hide password
+    await user.click(toggleButton);
+    expect(passwordInput).toHaveAttribute('type', 'password');
+  });
+
+  // Test 21: Password toggle button - Not displayed for non-password inputs
+  it('does not render toggle button for non-password inputs', () => {
+    render(<Input type="text" />);
+    
+    const toggleButton = screen.queryByRole('button');
+    expect(toggleButton).not.toBeInTheDocument();
+  });
+
+  // Test 22: Prioritizes error icon over password toggle
+  it('prioritizes error icon over password toggle', () => {
+    render(<Input type="password" error="Password is required" />);
+    
+    const passwordInput = document.querySelector('input[type="password"]');
+    expect(passwordInput).toBeInTheDocument();
+    
+    // Should not have toggle button when there is an error
+    const toggleButton = screen.queryByRole('button');
+    expect(toggleButton).not.toBeInTheDocument();
+    
+    // Should display error icon
+    const container = passwordInput?.parentElement;
+    const errorIcon = container?.querySelector('svg');
+    expect(errorIcon).toBeInTheDocument();
+    
+    const errorMessage = screen.getByText('Password is required');
+    expect(errorMessage).toBeInTheDocument();
+  });
+
+  // Test 23: Prioritizes success icon over password toggle
+  it('prioritizes success icon over password toggle', () => {
+    render(<Input type="password" success="Strong password" />);
+    
+    const passwordInput = document.querySelector('input[type="password"]');
+    expect(passwordInput).toBeInTheDocument();
+    
+    // Should not have toggle button when there is a success
+    const toggleButton = screen.queryByRole('button');
+    expect(toggleButton).not.toBeInTheDocument();
+    
+    // Should display success icon
+    const container = passwordInput?.parentElement;
+    const successIcon = container?.querySelector('svg');
+    expect(successIcon).toBeInTheDocument();
+    
+    const successMessage = screen.getByText('Strong password');
+    expect(successMessage).toBeInTheDocument();
   });
 });

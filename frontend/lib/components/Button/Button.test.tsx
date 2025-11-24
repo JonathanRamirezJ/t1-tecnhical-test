@@ -4,15 +4,15 @@ import userEvent from '@testing-library/user-event';
 import Button from './Button';
 
 describe('Button', () => {
-  // Test 1: Renderizado básico
+  // Test 1: Basic render
   it('renders correctly with default props', () => {
     render(<Button>Click me</Button>);
     const button = screen.getByRole('button', { name: /click me/i });
     expect(button).toBeInTheDocument();
-    expect(button).toHaveClass('bg-blue-600'); // primary variant por defecto
+    expect(button).toHaveClass('bg-blue-600'); // primary variant by default
   });
 
-  // Test 2: Variantes
+  // Test 2: Variants
   it('renders different variants correctly', () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>);
     expect(screen.getByRole('button')).toHaveClass('bg-blue-600');
@@ -24,7 +24,7 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('bg-red-600');
   });
 
-  // Test 3: Tamaños
+  // Test 3: Sizes
   it('renders different sizes correctly', () => {
     const { rerender } = render(<Button size="sm">Small</Button>);
     expect(screen.getByRole('button')).toHaveClass('px-3', 'py-1.5', 'text-sm');
@@ -36,26 +36,26 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveClass('px-6', 'py-3', 'text-lg');
   });
 
-  // Test 4: Estado disabled
+  // Test 4: Disabled state
   it('handles disabled state correctly', () => {
     render(<Button disabled>Disabled</Button>);
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
-    expect(button).toHaveClass('opacity-50', 'cursor-not-allowed');
+    expect(button).toHaveClass('disabled:opacity-50', 'disabled:cursor-not-allowed');
   });
 
-  // Test 5: Estado loading
+  // Test 5: Loading state
   it('handles loading state correctly', () => {
     render(<Button loading>Loading</Button>);
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
     expect(button).toHaveClass('cursor-wait');
-    expect(screen.getByText('Loading')).toHaveClass('opacity-0');
-    // Verificar que el spinner está presente
+    expect(screen.getByText('Loading')).toHaveClass('hidden');
+    // Verify that the spinner is present
     expect(button.querySelector('svg')).toBeInTheDocument();
   });
 
-  // Test 6: Interacciones - onClick
+  // Test 6: Interactions - onClick
   it('handles click events correctly', async () => {
     const handleClick = jest.fn();
     const user = userEvent.setup();
@@ -67,7 +67,7 @@ describe('Button', () => {
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  // Test 7: No ejecuta onClick cuando está disabled
+  // Test 7: Does not call onClick when disabled
   it('does not call onClick when disabled', async () => {
     const handleClick = jest.fn();
     const user = userEvent.setup();
@@ -79,7 +79,7 @@ describe('Button', () => {
     expect(handleClick).not.toHaveBeenCalled();
   });
 
-  // Test 8: Soporte para iconos
+  // Test 8: Icon support
   it('renders with icon correctly', () => {
     const TestIcon = () => <span data-testid="test-icon">🔥</span>;
     
@@ -92,7 +92,7 @@ describe('Button', () => {
     expect(screen.getByTestId('test-icon')).toBeInTheDocument();
   });
 
-  // Test 9: Posición del icono
+  // Test 9: Icon position
   it('renders icon in correct position', () => {
     const TestIcon = () => <span data-testid="test-icon">🔥</span>;
     
@@ -104,10 +104,13 @@ describe('Button', () => {
     
     let button = screen.getByRole('button');
     let icon = screen.getByTestId('test-icon');
-    let text = screen.getByText('Left Icon');
     
-    // El icono debe aparecer antes del texto
-    expect(button.firstChild).toContain(icon.parentElement);
+    // Verify that the icon is present
+    expect(icon).toBeInTheDocument();
+    
+    // For iconPosition="left", the first child should contain the icon
+    const firstChild = button.firstElementChild;
+    expect(firstChild).toContainElement(icon);
     
     rerender(
       <Button icon={<TestIcon />} iconPosition="right">
@@ -117,13 +120,13 @@ describe('Button', () => {
     
     button = screen.getByRole('button');
     icon = screen.getByTestId('test-icon');
-    text = screen.getByText('Right Icon');
     
-    // El icono debe aparecer después del texto
-    expect(button.lastChild).toContain(icon.parentElement);
+    // For iconPosition="right", the last child should contain the icon
+    const lastChild = button.lastElementChild;
+    expect(lastChild).toContainElement(icon);
   });
 
-  // Test 10: Props HTML nativas
+  // Test 10: HTML native props
   it('forwards HTML attributes correctly', () => {
     render(
       <Button 
@@ -149,7 +152,7 @@ describe('Button', () => {
     expect(ref.current).toBe(screen.getByRole('button'));
   });
 
-  // Test 12: Clases CSS personalizadas
+  // Test 12: Custom CSS classes
   it('applies custom className correctly', () => {
     render(<Button className="custom-class">Custom</Button>);
     const button = screen.getByRole('button');
