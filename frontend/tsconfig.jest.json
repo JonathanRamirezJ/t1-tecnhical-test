@@ -9,7 +9,7 @@
   "include": [
     "**/*.test.ts",
     "**/*.test.tsx",
-    "**/*.spec.ts", 
+    "**/*.spec.ts",
     "**/*.spec.tsx",
     "jest.setup.js",
     "jest.d.ts"

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Button, Input, Card } from "../../../lib";
+import { useState } from 'react';
+import { Button, Input, Card } from '../../../lib';
 
 export const FormDemo = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -53,9 +53,7 @@ export const FormDemo = () => {
           />
 
           <div className="flex justify-end gap-3">
-            <Button variant="secondary">
-              Cancelar
-            </Button>
+            <Button variant="secondary">Cancelar</Button>
             <Button
               variant="primary"
               onClick={handleSubmit}

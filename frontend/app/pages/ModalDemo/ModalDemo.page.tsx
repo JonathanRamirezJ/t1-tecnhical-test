@@ -1,16 +1,19 @@
-import { useState } from "react";
-import { Button, Card, Modal } from "../../../lib";
+import { useState } from 'react';
+import { Button, Card, Modal } from '../../../lib';
 
 export const ModalDemo = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [sizeModal, setSizeModal] = useState<'small' | 'medium' | 'large'>('small');
+  const [sizeModal, setSizeModal] = useState<'small' | 'medium' | 'large'>(
+    'small'
+  );
 
   return (
     <>
       <Card header="Modal Component" padding="lg">
         <div className="space-y-4">
           <p className="text-gray-600">
-            Los modales son útiles para confirmaciones, formularios y mostrar información adicional.
+            Los modales son útiles para confirmaciones, formularios y mostrar
+            información adicional.
           </p>
 
           <div className="flex gap-2">
@@ -53,10 +56,7 @@ export const ModalDemo = () => {
         header="Ejemplo de Modal"
         footer={
           <div className="flex justify-end gap-3">
-            <Button
-              variant="secondary"
-              onClick={() => setIsModalOpen(false)}
-            >
+            <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
               Cancelar
             </Button>
             <Button
@@ -76,8 +76,8 @@ export const ModalDemo = () => {
             Este es un ejemplo de modal con header, body y footer configurables.
           </p>
           <p className="text-gray-600">
-            Puedes cerrarlo haciendo clic en el botón X, presionando Escape,
-            o haciendo clic fuera del modal.
+            Puedes cerrarlo haciendo clic en el botón X, presionando Escape, o
+            haciendo clic fuera del modal.
           </p>
           <div className="bg-blue-50 p-4 rounded-md">
             <p className="text-blue-800 text-sm">

@@ -106,7 +106,7 @@ const Modal: React.FC<ModalProps> = ({
     >
       <div className={modalStyles}>
         {showCloseButton && <CloseButton />}
-        
+
         {header && (
           <div
             id="modal-header"
@@ -116,28 +116,30 @@ const Modal: React.FC<ModalProps> = ({
             "
           >
             {typeof header === 'string' ? (
-              <h2 className="text-lg font-semibold text-gray-900">
-                {header}
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-900">{header}</h2>
             ) : (
               header
             )}
           </div>
         )}
 
-        <div className="
+        <div
+          className="
           px-6 py-4 overflow-y-auto
           max-h-[calc(90vh-8rem)]
-        ">
+        "
+        >
           {children}
         </div>
 
         {footer && (
-          <div className="
+          <div
+            className="
             px-6 py-4 border-t border-gray-200
             bg-gray-50 rounded-b-lg
             flex justify-end gap-3
-          ">
+          "
+          >
             {footer}
           </div>
         )}

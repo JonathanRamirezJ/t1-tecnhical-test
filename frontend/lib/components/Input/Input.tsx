@@ -1,5 +1,10 @@
 import React, { useId, useMemo, useState } from 'react';
-import { EyeIcon, EyeSlashIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  ExclamationCircleIcon,
+  CheckCircleIcon,
+} from '@heroicons/react/24/outline';
 import { InputProps } from './Input.types';
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -23,12 +28,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     // Estado para mostrar/ocultar contraseña
     const [showPassword, setShowPassword] = useState(false);
-    
+
     // Generar ID único si no se proporciona usando useId para SSR
     // Usamos useMemo para evitar que se regenere en cada render
     const generatedId = useId();
     const inputId = useMemo(() => id || generatedId, [id, generatedId]);
-    
+
     // Determinar el variant basado en error/success
     const currentVariant = error ? 'error' : success ? 'success' : variant;
 
@@ -80,11 +85,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       ${sizeStyles[size]}
       ${variantStyles[currentVariant]}
       ${className}
-    `.replace(/\s+/g, ' ').trim();
+    `
+      .replace(/\s+/g, ' ')
+      .trim();
 
     const renderIcon = () => {
       // Prioridad: Error > Success > Toggle de contraseña
-      
+
       // Icono de error (máxima prioridad)
       if (currentVariant === 'error') {
         return (
@@ -93,7 +100,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </div>
         );
       }
-      
+
       // Icono de éxito (segunda prioridad)
       if (currentVariant === 'success') {
         return (
@@ -102,7 +109,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </div>
         );
       }
-      
+
       // Icono de toggle para contraseña (menor prioridad)
       if (type === 'password') {
         return (
@@ -122,12 +129,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </div>
         );
       }
-      
+
       return null;
     };
 
-    const showIcon = type === 'password' || currentVariant === 'error' || currentVariant === 'success';
-    
+    const showIcon =
+      type === 'password' ||
+      currentVariant === 'error' ||
+      currentVariant === 'success';
+
     // Determinar el tipo de input real (para el toggle de contraseña)
     const inputType = type === 'password' && showPassword ? 'text' : type;
 
@@ -139,7 +149,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
-        
+
         <div className="relative">
           <input
             ref={ref}
@@ -157,14 +167,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {(error || success || helperText) && (
           <div className="mt-1">
             {error && (
-              <p className={`text-sm ${helperTextStyles.error}`}>
-                {error}
-              </p>
+              <p className={`text-sm ${helperTextStyles.error}`}>{error}</p>
             )}
             {success && !error && (
-              <p className={`text-sm ${helperTextStyles.success}`}>
-                {success}
-              </p>
+              <p className={`text-sm ${helperTextStyles.success}`}>{success}</p>
             )}
             {helperText && !error && !success && (
               <p className={`text-sm ${helperTextStyles.default}`}>

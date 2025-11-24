@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Card, Input } from "../../../lib";
+import { useState } from 'react';
+import { Card, Input } from '../../../lib';
 
 export const InputsDemo = () => {
   const [password, setPassword] = useState<string>('');
@@ -32,8 +32,12 @@ export const InputsDemo = () => {
           label="Input password"
           placeholder="••••••••"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={password.length > 0 && password.length < 8 ? 'Mínimo 8 caracteres' : ''}
+          onChange={e => setPassword(e.target.value)}
+          error={
+            password.length > 0 && password.length < 8
+              ? 'Mínimo 8 caracteres'
+              : ''
+          }
           success={password.length >= 8 ? 'Contraseña válida' : ''}
         />
 

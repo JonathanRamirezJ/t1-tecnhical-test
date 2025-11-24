@@ -71,11 +71,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         return <LoadingSpinner />;
       }
       if (icon) {
-        return (
-          <span className={iconSizeStyles[size]}>
-            {icon}
-          </span>
-        );
+        return <span className={iconSizeStyles[size]}>{icon}</span>;
       }
       return null;
     };
@@ -85,7 +81,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ${variantStyles[variant]}
       ${sizeStyles[size]}
       ${className}
-    `.replace(/\s+/g, ' ').trim();
+    `
+      .replace(/\s+/g, ' ')
+      .trim();
 
     return (
       <button
@@ -95,9 +93,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {iconPosition === 'left' && renderIcon()}
-        <span className={loading ? 'hidden' : ''}>
-          {children}
-        </span>
+        <span className={loading ? 'hidden' : ''}>{children}</span>
         {iconPosition === 'right' && renderIcon()}
       </button>
     );

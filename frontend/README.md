@@ -14,6 +14,7 @@ Una librería de componentes React moderna y completa construida con TypeScript,
 ## 📦 Componentes Incluidos
 
 ### Button
+
 Botón versátil con múltiples variantes y estados.
 
 **Variantes**: `primary`, `secondary`, `danger`  
@@ -21,6 +22,7 @@ Botón versátil con múltiples variantes y estados.
 **Características**: Soporte para iconos, diferentes tamaños
 
 ### Input
+
 Campo de entrada con validación y estados visuales.
 
 **Tipos**: `text`, `email`, `password`  
@@ -28,12 +30,14 @@ Campo de entrada con validación y estados visuales.
 **Características**: Labels, placeholders, mensajes de ayuda
 
 ### Modal
+
 Modal configurable con header, body y footer.
 
 **Tamaños**: `small`, `medium`, `large`  
 **Características**: Cierre con overlay, tecla Escape, botón X
 
 ### Card
+
 Tarjeta flexible para mostrar contenido estructurado.
 
 **Variantes**: `default`, `outlined`, `elevated`  
@@ -42,21 +46,25 @@ Tarjeta flexible para mostrar contenido estructurado.
 ## 🛠 Instalación
 
 1. **Instalar dependencias**:
+
 ```bash
 npm install
 ```
 
 2. **Ejecutar tests**:
+
 ```bash
 npm test
 ```
 
 3. **Ejecutar tests con cobertura**:
+
 ```bash
 npm run test:coverage
 ```
 
 4. **Desarrollo**:
+
 ```bash
 npm run dev
 ```
@@ -64,6 +72,7 @@ npm run dev
 ## 📖 Uso Básico
 
 ### Importación
+
 ```typescript
 import { Button, Input, Modal, Card } from './lib';
 // o importaciones individuales
@@ -73,6 +82,7 @@ import { Button } from './lib/components/Button';
 ### Ejemplos de Uso
 
 #### Button
+
 ```tsx
 import { Button } from './lib';
 
@@ -85,8 +95,8 @@ function App() {
       </Button>
 
       {/* Botón con icono y estado loading */}
-      <Button 
-        variant="secondary" 
+      <Button
+        variant="secondary"
         loading={true}
         icon={<SaveIcon />}
         iconPosition="left"
@@ -104,6 +114,7 @@ function App() {
 ```
 
 #### Input
+
 ```tsx
 import { Input } from './lib';
 
@@ -119,7 +130,7 @@ function LoginForm() {
         label="Correo electrónico"
         placeholder="usuario@ejemplo.com"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={e => setEmail(e.target.value)}
         required
       />
 
@@ -143,6 +154,7 @@ function LoginForm() {
 ```
 
 #### Modal
+
 ```tsx
 import { Modal, Button } from './lib';
 
@@ -151,9 +163,7 @@ function App() {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>
-        Abrir Modal
-      </Button>
+      <Button onClick={() => setIsOpen(true)}>Abrir Modal</Button>
 
       <Modal
         isOpen={isOpen}
@@ -179,6 +189,7 @@ function App() {
 ```
 
 #### Card
+
 ```tsx
 import { Card, Button } from './lib';
 
@@ -188,9 +199,9 @@ function ProductCard() {
       variant="elevated"
       header="Producto Premium"
       image={{
-        src: "/product-image.jpg",
-        alt: "Imagen del producto",
-        position: "top"
+        src: '/product-image.jpg',
+        alt: 'Imagen del producto',
+        position: 'top',
       }}
       footer={
         <div className="flex justify-between">
@@ -212,27 +223,29 @@ function ProductCard() {
 ## 🎨 Design System
 
 ### Tokens de Diseño
+
 Los tokens están centralizados en `lib/design-system/design-tokens.ts`:
 
 ```typescript
 import { designTokens } from './lib';
 
 // Colores
-designTokens.colors.primary[500] // #3b82f6
-designTokens.colors.danger[600]  // #dc2626
+designTokens.colors.primary[500]; // #3b82f6
+designTokens.colors.danger[600]; // #dc2626
 
 // Espaciado
-designTokens.spacing[4] // 16px
-designTokens.spacing[8] // 32px
+designTokens.spacing[4]; // 16px
+designTokens.spacing[8]; // 32px
 
 // Tipografía
-designTokens.typography.fontSize.lg // ['18px', { lineHeight: '28px' }]
+designTokens.typography.fontSize.lg; // ['18px', { lineHeight: '28px' }]
 
 // Border radius
-designTokens.borderRadius.md // 6px
+designTokens.borderRadius.md; // 6px
 ```
 
 ### Personalización
+
 Para personalizar los tokens, modifica el archivo `design-tokens.ts`:
 
 ```typescript
@@ -251,6 +264,7 @@ export const designTokens = {
 ## 🧪 Testing
 
 ### Ejecutar Tests
+
 ```bash
 # Todos los tests
 npm test
@@ -263,7 +277,9 @@ npm run test:coverage
 ```
 
 ### Estructura de Tests
+
 Cada componente incluye tests completos:
+
 - ✅ Renderizado básico
 - ✅ Props y variantes
 - ✅ Interacciones del usuario
@@ -272,6 +288,7 @@ Cada componente incluye tests completos:
 - ✅ Eventos de teclado
 
 ### Cobertura Mínima
+
 - **Branches**: 80%
 - **Functions**: 80%
 - **Lines**: 80%
@@ -306,14 +323,18 @@ lib/
 ## 🔧 Configuración
 
 ### Jest
+
 La configuración de Jest está en `jest.config.js` con:
+
 - Entorno jsdom para React
 - Setup con Testing Library
 - Cobertura configurada
 - Soporte para TypeScript
 
 ### TypeScript
+
 Configuración estricta con:
+
 - Interfaces completas para todos los props
 - Tipos exportados para reutilización
 - Strict mode habilitado
@@ -327,6 +348,7 @@ Configuración estricta con:
 5. Abre un Pull Request
 
 ### Estándares de Código
+
 - Usar TypeScript estricto
 - Seguir convenciones de naming
 - Escribir tests para nuevos componentes

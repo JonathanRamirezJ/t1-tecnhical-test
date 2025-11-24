@@ -1,4 +1,4 @@
-import { Button, Card } from "../../../lib";
+import { Button, Card } from '../../../lib';
 
 export const CardDemo = () => {
   return (
@@ -8,9 +8,7 @@ export const CardDemo = () => {
           Las tarjetas pueden tener diferentes variantes y ser interactivas.
         </p>
 
-        <h4 className="text-sm font-bold text-gray-700 mb-2">
-          Variantes
-        </h4>
+        <h4 className="text-sm font-bold text-gray-700 mb-2">Variantes</h4>
 
         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
           <h4 className="text-sm font-bold text-gray-700 mb-2">
@@ -22,7 +20,9 @@ export const CardDemo = () => {
             hoverable
             header="Card outlined - Header Section"
           >
-            <p className="text-sm text-gray-600">Card outlined - Content Section</p>
+            <p className="text-sm text-gray-600">
+              Card outlined - Content Section
+            </p>
           </Card>
 
           <h4 className="text-sm font-bold text-gray-700 mb-2">
@@ -34,7 +34,9 @@ export const CardDemo = () => {
             hoverable
             header="Card elevated - Header Section"
           >
-            <p className="text-sm text-gray-700">Card elevated - Content Section</p>
+            <p className="text-sm text-gray-700">
+              Card elevated - Content Section
+            </p>
           </Card>
 
           <h4 className="text-sm font-bold text-gray-700 mb-2">
@@ -46,12 +48,18 @@ export const CardDemo = () => {
             hoverable
             header="Card con footer - Header Section"
             footer={
-              <Button variant="primary" size="sm" onClick={() => alert('Click en el botón del footer')}>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => alert('Click en el botón del footer')}
+              >
                 Acción - Footer Section
               </Button>
             }
           >
-            <p className="text-sm text-gray-700">Card con footer - Content Section</p>
+            <p className="text-sm text-gray-700">
+              Card con footer - Content Section
+            </p>
           </Card>
         </div>
 
@@ -59,11 +67,7 @@ export const CardDemo = () => {
           <h4 className="text-sm font-bold text-gray-700 mb-2">
             Variantes con imagenes
           </h4>
-          <Card
-            variant="default"
-            padding="sm"
-            hoverable
-          >
+          <Card variant="default" padding="sm" hoverable>
             <img src="https://picsum.photos/id/237/600/400" alt="image" />
           </Card>
         </div>

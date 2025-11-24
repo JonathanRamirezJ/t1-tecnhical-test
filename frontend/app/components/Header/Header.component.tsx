@@ -6,7 +6,8 @@ export const Header = () => {
           Librería de Componentes
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Una colección completa de componentes, construida con Tailwind CSS y Next.js con soporte para TypeScript.
+          Una colección completa de componentes, construida con Tailwind CSS y
+          Next.js con soporte para TypeScript.
         </p>
       </div>
     </header>

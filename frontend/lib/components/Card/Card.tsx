@@ -24,10 +24,13 @@ const Card: React.FC<CardProps> = ({
     elevated: 'shadow-lg border border-gray-100',
   };
 
-  const hoverStyles = (onClick || hoverable) ? `
+  const hoverStyles =
+    onClick || hoverable
+      ? `
     hover:shadow-md hover:scale-[1.02]
     active:scale-[0.98]
-  ` : '';
+  `
+      : '';
 
   const paddingStyles = {
     none: '',
@@ -41,7 +44,9 @@ const Card: React.FC<CardProps> = ({
     ${variantStyles[variant]}
     ${hoverStyles}
     ${className}
-  `.replace(/\s+/g, ' ').trim();
+  `
+    .replace(/\s+/g, ' ')
+    .trim();
 
   const handleClick = () => {
     if (onClick) {
@@ -75,14 +80,14 @@ const Card: React.FC<CardProps> = ({
     if (!header) return null;
 
     return (
-      <div className={`
+      <div
+        className={`
         border-b border-gray-200 bg-gray-50
         ${padding === 'none' ? 'px-4 py-3' : paddingStyles[padding]}
-      `}>
+      `}
+      >
         {typeof header === 'string' ? (
-          <h3 className="text-lg font-semibold text-gray-900">
-            {header}
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-900">{header}</h3>
         ) : (
           header
         )}
@@ -94,10 +99,12 @@ const Card: React.FC<CardProps> = ({
     if (!footer) return null;
 
     return (
-      <div className={`
+      <div
+        className={`
         border-t border-gray-200 bg-gray-50
         ${padding === 'none' ? 'px-4 py-3' : paddingStyles[padding]}
-      `}>
+      `}
+      >
         {footer}
       </div>
     );

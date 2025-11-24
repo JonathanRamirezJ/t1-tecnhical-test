@@ -12,10 +12,10 @@ export type { CardProps } from './components/Card';
 
 // Design System
 export { designTokens } from './design-system/design-tokens';
-export type { 
-  DesignTokens, 
-  ColorScale, 
-  SpacingScale, 
-  FontSize, 
-  BorderRadius 
+export type {
+  DesignTokens,
+  ColorScale,
+  SpacingScale,
+  FontSize,
+  BorderRadius,
 } from './design-system/design-tokens';

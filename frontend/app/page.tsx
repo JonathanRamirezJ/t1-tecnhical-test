@@ -20,7 +20,6 @@ export default function Home() {
 
         {/* Componentes Demo */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-
           {/* Button Examples */}
           <ButtonsDemo />
 

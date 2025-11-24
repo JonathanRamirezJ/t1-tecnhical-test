@@ -41,7 +41,10 @@ describe('Button', () => {
     render(<Button disabled>Disabled</Button>);
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
-    expect(button).toHaveClass('disabled:opacity-50', 'disabled:cursor-not-allowed');
+    expect(button).toHaveClass(
+      'disabled:opacity-50',
+      'disabled:cursor-not-allowed'
+    );
   });
 
   // Test 5: Loading state
@@ -59,10 +62,10 @@ describe('Button', () => {
   it('handles click events correctly', async () => {
     const handleClick = jest.fn();
     const user = userEvent.setup();
-    
+
     render(<Button onClick={handleClick}>Click me</Button>);
     const button = screen.getByRole('button');
-    
+
     await user.click(button);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -71,10 +74,14 @@ describe('Button', () => {
   it('does not call onClick when disabled', async () => {
     const handleClick = jest.fn();
     const user = userEvent.setup();
-    
-    render(<Button onClick={handleClick} disabled>Disabled</Button>);
+
+    render(
+      <Button onClick={handleClick} disabled>
+        Disabled
+      </Button>
+    );
     const button = screen.getByRole('button');
-    
+
     await user.click(button);
     expect(handleClick).not.toHaveBeenCalled();
   });
@@ -82,45 +89,45 @@ describe('Button', () => {
   // Test 8: Icon support
   it('renders with icon correctly', () => {
     const TestIcon = () => <span data-testid="test-icon">🔥</span>;
-    
+
     render(
       <Button icon={<TestIcon />} iconPosition="left">
         With Icon
       </Button>
     );
-    
+
     expect(screen.getByTestId('test-icon')).toBeInTheDocument();
   });
 
   // Test 9: Icon position
   it('renders icon in correct position', () => {
     const TestIcon = () => <span data-testid="test-icon">🔥</span>;
-    
+
     const { rerender } = render(
       <Button icon={<TestIcon />} iconPosition="left">
         Left Icon
       </Button>
     );
-    
+
     let button = screen.getByRole('button');
     let icon = screen.getByTestId('test-icon');
-    
+
     // Verify that the icon is present
     expect(icon).toBeInTheDocument();
-    
+
     // For iconPosition="left", the first child should contain the icon
     const firstChild = button.firstElementChild;
     expect(firstChild).toContainElement(icon);
-    
+
     rerender(
       <Button icon={<TestIcon />} iconPosition="right">
         Right Icon
       </Button>
     );
-    
+
     button = screen.getByRole('button');
     icon = screen.getByTestId('test-icon');
-    
+
     // For iconPosition="right", the last child should contain the icon
     const lastChild = button.lastElementChild;
     expect(lastChild).toContainElement(icon);
@@ -129,15 +136,15 @@ describe('Button', () => {
   // Test 10: HTML native props
   it('forwards HTML attributes correctly', () => {
     render(
-      <Button 
-        data-testid="custom-button" 
+      <Button
+        data-testid="custom-button"
         aria-label="Custom button"
         type="submit"
       >
         Submit
       </Button>
     );
-    
+
     const button = screen.getByTestId('custom-button');
     expect(button).toHaveAttribute('aria-label', 'Custom button');
     expect(button).toHaveAttribute('type', 'submit');
@@ -147,7 +154,7 @@ describe('Button', () => {
   it('forwards ref correctly', () => {
     const ref = React.createRef<HTMLButtonElement>();
     render(<Button ref={ref}>Button with ref</Button>);
-    
+
     expect(ref.current).toBeInstanceOf(HTMLButtonElement);
     expect(ref.current).toBe(screen.getByRole('button'));
   });
