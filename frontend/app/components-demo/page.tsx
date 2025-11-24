@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Card, Button } from '../../lib';
 import ProtectedRoute from '../components/ProtectedRoute';
 
-/* Pages*/
-import { ButtonsDemo } from '../pages/ButtonsDemo/ButtonsDemo.page';
-import { InputsDemo } from '../pages/InputsDemo/InputsDemo.page';
-import { ModalDemo } from '../pages/ModalDemo/ModalDemo.page';
-import { CardDemo } from '../pages/CardDemo/CardDemo.page';
-import { FormDemo } from '../pages/FormDemo/FormDemo.page';
+/* Demo Components */
+import { ButtonsDemo } from '../demo-components/ButtonsDemo/ButtonsDemo.page';
+import { InputsDemo } from '../demo-components/InputsDemo/InputsDemo.page';
+import { ModalDemo } from '../demo-components/ModalDemo/ModalDemo.page';
+import { CardDemo } from '../demo-components/CardDemo/CardDemo.page';
+import { FormDemo } from '../demo-components/FormDemo/FormDemo.page';
 
 /* Components */
 import { Header } from '../components/Header/Header.component';
