@@ -23,24 +23,24 @@ const PublicRoute: React.FC<PublicRouteProps> = ({
   }, [isAuthenticated, isLoading, router, redirectTo]);
 
   if (isLoading) {
-    // Mostrar un loading spinner mientras se verifica la autenticación
+    // Show loading spinner while verifying authentication
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
   if (isAuthenticated) {
-    // Mostrar loading mientras redirige
+    // Show loading while redirecting
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Redirigiendo...</p>
+          <p className="mt-4 text-gray-600">Redirecting...</p>
         </div>
       </div>
     );

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Formik, Form } from 'formik';
 import { Card, Button, Input } from '../../lib';
@@ -11,14 +10,14 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
 
-  // Valores iniciales del formulario
+  // Form initial values
   const initialValues: RegisterFormData = {
     email: '',
     password: '',
     confirmPassword: '',
   };
 
-  // Función para manejar el submit del formulario
+  // Function to handle form submission
   const handleSubmit = async (
     values: RegisterFormData,
     { setSubmitting, setFieldError }: any

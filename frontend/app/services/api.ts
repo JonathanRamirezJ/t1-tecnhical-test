@@ -1,8 +1,8 @@
-// Configuración de la API
+// API configuration
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
-// Tipos para las respuestas de la API
+// Types for API responses
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -32,7 +32,7 @@ export interface AuthResponse {
   token: string;
 }
 
-// Función helper para hacer peticiones HTTP
+// Helper function for HTTP requests
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -43,7 +43,7 @@ async function apiRequest<T>(
     'Content-Type': 'application/json',
   };
 
-  // Agregar token de autorización si existe
+  // Add authorization token if exists
   const token = getAuthToken();
   if (token) {
     defaultHeaders['Authorization'] = `Bearer ${token}`;
@@ -80,18 +80,18 @@ async function apiRequest<T>(
   }
 }
 
-// Función para obtener el token de autenticación
+// Function to get authentication token
 function getAuthToken(): string | null {
-  // En producción, esto podría venir de cookies seguras o sessionStorage
-  // Por ahora retornamos null ya que no usamos localStorage
+  // In production, this could come from secure cookies or sessionStorage
+  // For now we return null since we don't use localStorage
   return null;
 }
 
-// API de autenticación
+// Authentication API
 export const authAPI = {
   // Login
   async login(credentials: LoginRequest): Promise<ApiResponse<AuthResponse>> {
-    // SIMULACIÓN - En producción sería una llamada real al backend
+    // SIMULATION - In production, this would be a real call to the backend
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     if (credentials.email && credentials.password.length >= 6) {
@@ -111,22 +111,22 @@ export const authAPI = {
     } else {
       return {
         success: false,
-        error: 'Credenciales inválidas',
+        error: 'Invalid credentials',
       };
     }
 
-    // EN PRODUCCIÓN sería algo como:
+    // IN PRODUCTION would be something like:
     // return apiRequest<AuthResponse>('/auth/login', {
     //     method: 'POST',
     //     body: JSON.stringify(credentials),
     // });
   },
 
-  // Registro
+  // Register
   async register(
     userData: RegisterRequest
   ): Promise<ApiResponse<AuthResponse>> {
-    // SIMULACIÓN - En producción sería una llamada real al backend
+    // SIMULATION - In production, this would be a real call to the backend
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const mockResponse: AuthResponse = {
@@ -143,7 +143,7 @@ export const authAPI = {
       data: mockResponse,
     };
 
-    // EN PRODUCCIÓN sería algo como:
+    // IN PRODUCTION would be something like:
     // return apiRequest<AuthResponse>('/auth/register', {
     //     method: 'POST',
     //     body: JSON.stringify(userData),
@@ -152,22 +152,22 @@ export const authAPI = {
 
   // Logout
   async logout(): Promise<ApiResponse<void>> {
-    // SIMULACIÓN - En producción sería una llamada real al backend
+    // SIMULATION - In production, this would be a real call to the backend
     await new Promise(resolve => setTimeout(resolve, 500));
 
     return {
       success: true,
     };
 
-    // EN PRODUCCIÓN sería algo como:
+    // IN PRODUCTION would be something like:
     // return apiRequest<void>('/auth/logout', {
     //     method: 'POST',
     // });
   },
 
-  // Verificar token
+  // Verify token
   async verifyToken(token: string): Promise<ApiResponse<User>> {
-    // SIMULACIÓN - En producción sería una llamada real al backend
+    // SIMULATION - In production, this would be a real call to the backend
     await new Promise(resolve => setTimeout(resolve, 300));
 
     if (token.startsWith('fake-jwt-token-')) {
@@ -185,11 +185,11 @@ export const authAPI = {
     } else {
       return {
         success: false,
-        error: 'Token inválido',
+        error: 'Invalid token',
       };
     }
 
-    // EN PRODUCCIÓN sería algo como:
+    // IN PRODUCTION would be something like:
     // return apiRequest<User>('/auth/verify', {
     //     method: 'GET',
     // });
@@ -197,29 +197,29 @@ export const authAPI = {
 
   // Refresh token
   async refreshToken(): Promise<ApiResponse<AuthResponse>> {
-    // SIMULACIÓN - En producción sería una llamada real al backend
+    // SIMULATION - In production, this would be a real call to the backend
     await new Promise(resolve => setTimeout(resolve, 500));
 
     return {
       success: false,
-      error: 'Refresh token no implementado en simulación',
+      error: 'Refresh token not implemented in simulation',
     };
 
-    // EN PRODUCCIÓN sería algo como:
+    // IN PRODUCTION would be something like:
     // return apiRequest<AuthResponse>('/auth/refresh', {
     //     method: 'POST',
     // });
   },
 };
 
-// Otras APIs que podrías necesitar
+// Other APIs you might need
 export const userAPI = {
-  // Obtener perfil del usuario
+  // Get user profile
   async getProfile(): Promise<ApiResponse<User>> {
     return apiRequest<User>('/user/profile');
   },
 
-  // Actualizar perfil
+  // Update profile
   async updateProfile(userData: Partial<User>): Promise<ApiResponse<User>> {
     return apiRequest<User>('/user/profile', {
       method: 'PUT',

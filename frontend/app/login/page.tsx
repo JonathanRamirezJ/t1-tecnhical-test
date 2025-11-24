@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form } from 'formik';
 import { Card, Button, Input } from '../../lib';
 import { useAuth } from '../contexts/AuthContext';
 import { loginSchema, LoginFormData } from '../schemas/authSchemas';
@@ -11,13 +10,13 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
 
-  // Valores iniciales del formulario
+  // Form initial values
   const initialValues: LoginFormData = {
     email: '',
     password: '',
   };
 
-  // Función para manejar el submit del formulario
+  // Function to handle form submission
   const handleSubmit = async (
     values: LoginFormData,
     { setSubmitting, setFieldError }: any

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './contexts/AuthContext';
 
@@ -18,7 +18,7 @@ export default function Home() {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // Mostrar loading mientras se determina la redirección
+  // Redirect based on authentication status
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="text-center">

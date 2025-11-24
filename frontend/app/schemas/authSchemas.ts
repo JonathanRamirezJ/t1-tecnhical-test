@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-// Schema para el formulario de Login
+// Schema for Login form
 export const loginSchema = yup.object({
   email: yup
     .string()
@@ -13,7 +13,7 @@ export const loginSchema = yup.object({
     .min(6, 'La contraseña debe tener al menos 6 caracteres'),
 });
 
-// Schema para el formulario de Register
+// Schema for Register form
 export const registerSchema = yup.object({
   email: yup
     .string()
@@ -34,11 +34,11 @@ export const registerSchema = yup.object({
     .oneOf([yup.ref('password')], 'Las contraseñas no coinciden'),
 });
 
-// Tipos TypeScript inferidos de los schemas
+// TypeScript types inferred from schemas
 export type LoginFormData = yup.InferType<typeof loginSchema>;
 export type RegisterFormData = yup.InferType<typeof registerSchema>;
 
-// Función helper para validar un schema y retornar errores formateados
+// Helper function to validate a schema and return formatted errors
 export const validateSchema = async (
   schema: yup.AnyObjectSchema,
   data: any
@@ -60,7 +60,7 @@ export const validateSchema = async (
   }
 };
 
-// Función helper para validar un campo específico
+// Helper function to validate a specific field
 export const validateField = async (
   schema: yup.AnyObjectSchema,
   fieldName: string,
@@ -68,7 +68,7 @@ export const validateField = async (
   allData: any
 ): Promise<string | null> => {
   try {
-    // Validar solo el campo específico en el contexto de todos los datos
+    // Validate only the specific field in the context of all data
     await schema.validateAt(fieldName, { ...allData, [fieldName]: value });
     return null;
   } catch (error) {
