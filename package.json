@@ -1,0 +1,33 @@
+{
+  "name": "t1-tecnhical-test",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm:dev:front\" \"npm:dev:back\"",
+    "dev:front": "npm --workspace frontend run dev",
+    "dev:back": "npm --workspace backend run dev",
+    "test": "npm --workspace frontend run test",
+    "test:watch": "npm --workspace frontend run test:watch",
+    "test:coverage": "npm --workspace frontend run test:coverage",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.6.2"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.2.0"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ]
+  }
+}
