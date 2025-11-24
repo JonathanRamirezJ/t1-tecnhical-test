@@ -14,6 +14,7 @@ export default function RegisterPage() {
 
   // Form initial values
   const initialValues: RegisterFormData = {
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -26,7 +27,7 @@ export default function RegisterPage() {
   ) => {
     try {
       setIsSubmitting(true);
-      await register(values.email, values.password);
+      await register(values.name, values.email, values.password);
       router.push('/dashboard');
     } catch (error) {
       console.error('Error en registro:', error);
@@ -76,6 +77,22 @@ export default function RegisterPage() {
               isValid,
             }) => (
               <Form className="space-y-6">
+                <div>
+                  <Input
+                    id="register-name"
+                    label="Nombre Completo"
+                    type="text"
+                    name="name"
+                    value={values.name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder="Tu nombre completo"
+                    required
+                    error={touched.name && errors.name ? errors.name : ''}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
                 <div>
                   <Input
                     id="register-email"

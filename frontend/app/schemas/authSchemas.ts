@@ -15,6 +15,12 @@ export const loginSchema = yup.object({
 
 // Schema for Register form
 export const registerSchema = yup.object({
+  name: yup
+    .string()
+    .required('El nombre es requerido')
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(50, 'El nombre no puede tener más de 50 caracteres')
+    .trim(),
   email: yup
     .string()
     .required('El email es requerido')
