@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Formik, Form } from 'formik';
 import { Card, Button, Input } from '../../lib';
@@ -9,6 +10,7 @@ import { registerSchema, RegisterFormData } from '../schemas/authSchemas';
 export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Form initial values
   const initialValues: RegisterFormData = {
@@ -20,9 +22,10 @@ export default function RegisterPage() {
   // Function to handle form submission
   const handleSubmit = async (
     values: RegisterFormData,
-    { setSubmitting, setFieldError }: any
+    { setFieldError }: any
   ) => {
     try {
+      setIsSubmitting(true);
       await register(values.email, values.password);
       router.push('/dashboard');
     } catch (error) {
@@ -32,7 +35,7 @@ export default function RegisterPage() {
         'Error al crear la cuenta. El email podría ya estar en uso.'
       );
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -48,13 +51,12 @@ export default function RegisterPage() {
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           ¿Ya tienes una cuenta?{' '}
-          <button
-            type="button"
+          <a
             onClick={handleLoginRedirect}
-            className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+            className="font-medium text-blue-600 hover:text-blue-500 transition-colors cursor-pointer"
           >
             Inicia sesión aquí
-          </button>
+          </a>
         </p>
       </div>
 
@@ -69,13 +71,14 @@ export default function RegisterPage() {
               values,
               errors,
               touched,
-              isSubmitting,
               handleChange,
               handleBlur,
+              isValid,
             }) => (
               <Form className="space-y-6">
                 <div>
                   <Input
+                    id="register-email"
                     label="Email"
                     type="email"
                     name="email"
@@ -91,6 +94,7 @@ export default function RegisterPage() {
 
                 <div>
                   <Input
+                    id="register-password"
                     label="Contraseña"
                     type="password"
                     name="password"
@@ -109,6 +113,7 @@ export default function RegisterPage() {
 
                 <div>
                   <Input
+                    id="register-confirm-password"
                     label="Confirmar Contraseña"
                     type="password"
                     name="confirmPassword"
@@ -128,19 +133,19 @@ export default function RegisterPage() {
 
                 <div className="text-xs text-gray-500">
                   Al registrarte, aceptas nuestros{' '}
-                  <button
-                    type="button"
-                    className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                  <a
+                    href="#"
+                    className="font-medium text-blue-600 hover:text-blue-500 transition-colors cursor-pointer"
                   >
                     Términos de Servicio
-                  </button>{' '}
+                  </a>{' '}
                   y{' '}
-                  <button
-                    type="button"
-                    className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                  <a
+                    href="#"
+                    className="font-medium text-blue-600 hover:text-blue-500 transition-colors cursor-pointer"
                   >
                     Política de Privacidad
-                  </button>
+                  </a>
                 </div>
 
                 <Button
@@ -148,7 +153,7 @@ export default function RegisterPage() {
                   variant="primary"
                   size="lg"
                   loading={isSubmitting}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                   className="w-full"
                 >
                   {isSubmitting ? 'Creando cuenta...' : 'Crear Cuenta'}

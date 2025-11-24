@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Formik, Form } from 'formik';
 import { Card, Button, Input } from '../../lib';
@@ -9,6 +10,7 @@ import { loginSchema, LoginFormData } from '../schemas/authSchemas';
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Form initial values
   const initialValues: LoginFormData = {
@@ -19,9 +21,10 @@ export default function LoginPage() {
   // Function to handle form submission
   const handleSubmit = async (
     values: LoginFormData,
-    { setSubmitting, setFieldError }: any
+    { setFieldError }: any
   ) => {
     try {
+      setIsSubmitting(true);
       await login(values.email, values.password);
       router.push('/dashboard');
     } catch (error) {
@@ -31,7 +34,7 @@ export default function LoginPage() {
         'Credenciales inválidas. Por favor, verifica tu email y contraseña.'
       );
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -47,13 +50,12 @@ export default function LoginPage() {
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           ¿No tienes una cuenta?{' '}
-          <button
-            type="button"
+          <a
             onClick={handleRegisterRedirect}
-            className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+            className="font-medium text-blue-600 hover:text-blue-500 transition-colors cursor-pointer"
           >
             Regístrate aquí
-          </button>
+          </a>
         </p>
       </div>
 
@@ -68,14 +70,14 @@ export default function LoginPage() {
               values,
               errors,
               touched,
-              isSubmitting,
               handleChange,
               handleBlur,
+              isValid,
             }) => (
               <Form className="space-y-6">
                 <div>
                   <Input
-                    id="email"
+                    id="login-email"
                     name="email"
                     type="email"
                     label="Email"
@@ -91,7 +93,7 @@ export default function LoginPage() {
 
                 <div>
                   <Input
-                    id="password"
+                    id="login-password"
                     name="password"
                     type="password"
                     label="Contraseña"
@@ -124,9 +126,9 @@ export default function LoginPage() {
                   size="lg"
                   className="w-full"
                   loading={isSubmitting}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                 >
-                  {isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                  Iniciar Sesión
                 </Button>
               </Form>
             )}
