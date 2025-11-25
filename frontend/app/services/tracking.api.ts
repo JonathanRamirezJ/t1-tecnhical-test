@@ -12,7 +12,7 @@ import {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
-// Helper function for HTTP requests
+// Helper function for HTTP requests (with authentication)
 async function trackingApiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -42,6 +42,36 @@ async function trackingApiRequest<T>(
     ...options,
   };
 
+  return makeRequest<T>(url, config);
+}
+
+// Helper function for public HTTP requests (no authentication required)
+async function publicTrackingApiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> {
+  const url = `${API_BASE_URL}${endpoint}`;
+
+  const defaultHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  const config: RequestInit = {
+    headers: {
+      ...defaultHeaders,
+      ...options.headers,
+    },
+    ...options,
+  };
+
+  return makeRequest<T>(url, config);
+}
+
+// Common request logic
+async function makeRequest<T>(
+  url: string,
+  config: RequestInit
+): Promise<ApiResponse<T>> {
   try {
     const response = await fetch(url, config);
     const data = await response.json();
@@ -125,7 +155,7 @@ export const trackingAPI = {
       },
     };
 
-    return trackingApiRequest<TrackingResponse>('/components/track', {
+    return publicTrackingApiRequest<TrackingResponse>('/components/track', {
       method: 'POST',
       body: JSON.stringify(trackingEvent),
     });
@@ -152,12 +182,12 @@ export const trackingAPI = {
     }
 
     const endpoint = `/components/stats${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return trackingApiRequest<TrackingStats>(endpoint);
+    return publicTrackingApiRequest<TrackingStats>(endpoint);
   },
 
   // Get real-time statistics
   async getRealTimeStats(): Promise<ApiResponse<BackendRealTimeStats>> {
-    return trackingApiRequest<BackendRealTimeStats>(
+    return publicTrackingApiRequest<BackendRealTimeStats>(
       '/components/stats/realtime'
     );
   },

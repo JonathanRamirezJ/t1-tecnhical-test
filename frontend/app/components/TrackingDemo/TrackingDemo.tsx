@@ -206,7 +206,7 @@ export const TrackingDemo: React.FC = () => {
                 variant="primary"
                 onClick={() => setClickCount(c => c + 1)}
               >
-                Botón Primario (Clicks: {clickCount})
+                Botón Primario
               </TrackedButton>
               <TrackedButton variant="secondary">
                 Botón Secundario

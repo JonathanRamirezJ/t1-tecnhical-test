@@ -15,10 +15,12 @@ const {
 
 const router = express.Router();
 
+// Public routes (no authentication required)
+router.post('/track', validateComponentTracking, trackComponent);
+router.get('/stats', validateStatsQuery, getStats);
+router.get('/stats/realtime', getRealTimeStats);
+
 // Protected routes (require authentication)
-router.post('/track', auth, validateComponentTracking, trackComponent);
-router.get('/stats', auth, validateStatsQuery, getStats);
-router.get('/stats/realtime', auth, getRealTimeStats);
 router.get('/:componentName/details', auth, getComponentDetails);
 router.get('/export', auth, validateExportQuery, exportData);
 

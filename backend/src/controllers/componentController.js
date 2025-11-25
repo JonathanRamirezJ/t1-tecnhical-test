@@ -21,7 +21,7 @@ const trackComponent = async (req, res, next) => {
       location = {},
     } = req.body;
 
-    // Agregar userId si el usuario está autenticado
+    // Agregar userId si el usuario está autenticado (opcional para endpoints públicos)
     const trackingData = {
       componentName,
       variant,
@@ -32,7 +32,8 @@ const trackComponent = async (req, res, next) => {
       location,
     };
 
-    if (req.user) {
+    // Solo agregar userId si el usuario está autenticado
+    if (req.user && req.user._id) {
       trackingData.userId = req.user._id;
     }
 

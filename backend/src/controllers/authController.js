@@ -113,6 +113,11 @@ const getMe = async (req, res, next) => {
   }
 };
 
+/**
+ * improvements for the future
+ * updateProfile()
+ * changePassword()
+ */
 const updateProfile = async (req, res, next) => {
   try {
     const { name } = req.body;

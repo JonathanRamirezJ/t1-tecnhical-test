@@ -147,7 +147,7 @@ const ExportSection: React.FC<ExportSectionProps> = ({
           <div className="pt-4 border-t border-gray-200">
             <div className="flex justify-between items-center text-sm text-gray-500">
               <span>Última exportación:</span>
-              <span>Nunca</span>
+              <span>{new Date().toLocaleString()}</span>
             </div>
           </div>
         </div>
