@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Modal, Button } from '../../../lib';
 import { ComponentPage } from '../components/ComponentPage';
 import { PropInfo } from '../components/PropsTable';
-import ProtectedRoute from '../../components/ProtectedRoute';
+import { ProtectedRoute, ConditionalTrackingProvider } from '../../components';
 
 // Modal component examples
 const ModalExamples = () => {
@@ -303,7 +303,9 @@ function ModalPageContent() {
 export default function ModalPage() {
   return (
     <ProtectedRoute>
-      <ModalPageContent />
+      <ConditionalTrackingProvider>
+        <ModalPageContent />
+      </ConditionalTrackingProvider>
     </ProtectedRoute>
   );
 }

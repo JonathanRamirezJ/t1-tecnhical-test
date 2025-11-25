@@ -46,13 +46,13 @@ async function apiRequest<T>(
       };
     }
 
-    // El backend devuelve { status: 'success', data: {...}, message: '...', token?: '...' }
+    // backend returns { status: 'success', data: {...}, message: '...', token?: '...' }
     if (data.status === 'success') {
       return {
         success: true,
         data: data.data || data,
         message: data.message,
-        token: data.token, // Pasar el token si existe
+        token: data.token, // pass the token if it exists
       };
     } else {
       return {
@@ -111,13 +111,13 @@ export const authAPI = {
       console.log('API Login: Respuesta completa:', response);
       console.log('API Login: Datos recibidos:', response.data);
 
-      // El backend devuelve { status: 'success', token: '...', data: { user: {...} } }
+      // backend returns { status: 'success', token: '...', data: { user: {...} } }
       const authData: AuthResponse = {
         user: response.data.user,
-        token: response.token!, // El token ahora viene en response.token
+        token: response.token!, // token now comes in response.token
       };
 
-      // Guardar el token
+      // save token
       if (authData.token) {
         console.log(
           'API Login: Guardando token:',
@@ -125,7 +125,7 @@ export const authAPI = {
         );
         setAuthToken(authData.token);
 
-        // Verificar inmediatamente que se guardó
+        // Immediately verify that it was saved
         const verificacion = localStorage.getItem('auth_token');
         console.log(
           'API Login: Token verificado en localStorage:',
@@ -156,13 +156,13 @@ export const authAPI = {
     });
 
     if (response.success && response.data) {
-      // El backend devuelve { status: 'success', token: '...', data: { user: {...} } }
+      // backend returns { status: 'success', token: '...', data: { user: {...} } }
       const authData: AuthResponse = {
         user: response.data.user,
-        token: response.token!, // El token viene en response.token
+        token: response.token!, // token comes in response.token
       };
 
-      // Guardar el token
+      // save token
       if (authData.token) {
         console.log('API Register: Guardando token...');
         setAuthToken(authData.token);
@@ -180,10 +180,10 @@ export const authAPI = {
 
   // Logout
   async logout(): Promise<ApiResponse<void>> {
-    // Verificar que tenemos un token antes de hacer la petición
+    // Verify that we have a token before making the request
     const token = getAuthToken();
     if (!token) {
-      // Si no hay token, simplemente limpiamos el localStorage
+      // If there's no token, simply clean localStorage
       removeAuthToken();
       return {
         success: true,
@@ -195,7 +195,7 @@ export const authAPI = {
       method: 'POST',
     });
 
-    // Siempre remover el token del localStorage, independientemente del resultado
+    // always remove the token from localStorage, regardless of the result
     removeAuthToken();
 
     return response;

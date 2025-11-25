@@ -10,7 +10,7 @@ export interface TrackingEvent {
     timestamp?: string;
     elementId?: string;
     elementText?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | undefined;
   };
   performance?: {
     loadTime?: number;
@@ -88,7 +88,7 @@ export interface TopAction {
   count: number;
 }
 
-// Estructura que devuelve el backend para estadísticas en tiempo real
+// Structure returned by backend for real-time statistics
 export interface BackendRealTimeStats {
   realTime: {
     lastHour: {
@@ -115,7 +115,7 @@ export interface BackendRealTimeStats {
   timestamp: string;
 }
 
-// Estructura que usa el frontend (adaptada)
+// Structure used by the frontend (adapted)
 export interface RealTimeStats {
   totalInteractionsToday: number;
   activeUsers: number;

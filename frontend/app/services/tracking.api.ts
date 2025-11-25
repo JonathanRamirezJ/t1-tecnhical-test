@@ -2,7 +2,6 @@ import { ApiResponse } from './api.types';
 import {
   TrackingEvent,
   TrackingStats,
-  RealTimeStats,
   BackendRealTimeStats,
   ExportOptions,
   TrackingResponse,
@@ -12,7 +11,7 @@ import {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
-// Helper function for HTTP requests
+// Helper function for HTTP requests (with authentication)
 async function trackingApiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -42,6 +41,36 @@ async function trackingApiRequest<T>(
     ...options,
   };
 
+  return makeRequest<T>(url, config);
+}
+
+// Helper function for public HTTP requests (no authentication required)
+async function publicTrackingApiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> {
+  const url = `${API_BASE_URL}${endpoint}`;
+
+  const defaultHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  const config: RequestInit = {
+    headers: {
+      ...defaultHeaders,
+      ...options.headers,
+    },
+    ...options,
+  };
+
+  return makeRequest<T>(url, config);
+}
+
+// Common request logic
+async function makeRequest<T>(
+  url: string,
+  config: RequestInit
+): Promise<ApiResponse<T>> {
   try {
     const response = await fetch(url, config);
     const data = await response.json();
@@ -96,15 +125,16 @@ export const trackingAPI = {
   async trackComponent(
     event: Omit<TrackingEvent, 'sessionId'>
   ): Promise<ApiResponse<TrackingResponse>> {
-    // Limpiar y validar datos antes de enviar
-    const cleanMetadata: Record<string, unknown> = {
-      ...event.metadata,
-      // Solo incluir campos seguros en metadata
-      timestamp: new Date().toISOString(),
-      // No incluir URL ni userAgent para evitar errores de validación
-    };
+    // Clean and validate data before sending
+    const cleanMetadata: Record<string, string | number | boolean | undefined> =
+      {
+        ...event.metadata,
+        // Only include safe fields in metadata
+        timestamp: new Date().toISOString(),
+        // Don't include URL or userAgent to avoid validation errors
+      };
 
-    // Remover campos undefined o null
+    // Remove undefined or null fields
     Object.keys(cleanMetadata).forEach(key => {
       if (cleanMetadata[key] === undefined || cleanMetadata[key] === null) {
         delete cleanMetadata[key];
@@ -124,7 +154,7 @@ export const trackingAPI = {
       },
     };
 
-    return trackingApiRequest<TrackingResponse>('/components/track', {
+    return publicTrackingApiRequest<TrackingResponse>('/components/track', {
       method: 'POST',
       body: JSON.stringify(trackingEvent),
     });
@@ -151,20 +181,20 @@ export const trackingAPI = {
     }
 
     const endpoint = `/components/stats${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    return trackingApiRequest<TrackingStats>(endpoint);
+    return publicTrackingApiRequest<TrackingStats>(endpoint);
   },
 
   // Get real-time statistics
   async getRealTimeStats(): Promise<ApiResponse<BackendRealTimeStats>> {
-    return trackingApiRequest<BackendRealTimeStats>(
+    return publicTrackingApiRequest<BackendRealTimeStats>(
       '/components/stats/realtime'
     );
   },
 
-  // Export data
+  // Export data - download file from backend
   async exportData(
     options: ExportOptions
-  ): Promise<ApiResponse<{ downloadUrl: string }>> {
+  ): Promise<{ success: boolean; error?: string }> {
     const queryParams = new URLSearchParams();
 
     Object.entries(options).forEach(([key, value]) => {
@@ -173,8 +203,73 @@ export const trackingAPI = {
       }
     });
 
-    const endpoint = `/components/export?${queryParams.toString()}`;
-    return trackingApiRequest<{ downloadUrl: string }>(endpoint);
+    const url = `${API_BASE_URL}/components/export?${queryParams.toString()}`;
+
+    try {
+      // Add authorization token
+      const token =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('auth_token')
+          : null;
+      const headers: Record<string, string> = {};
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+      });
+
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: 'Error desconocido' }));
+        return {
+          success: false,
+          error:
+            errorData.message ||
+            `Error ${response.status}: ${response.statusText}`,
+        };
+      }
+
+      // Get filename from headers
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `tracking-data-${new Date().toISOString().split('T')[0]}.${options.format}`;
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Convert response to blob and download
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+
+      // Create download element
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      link.style.display = 'none';
+
+      // Add to DOM, click and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean URL
+      URL.revokeObjectURL(downloadUrl);
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error de red',
+      };
+    }
   },
 
   // Get component details

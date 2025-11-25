@@ -113,7 +113,7 @@ export const useTracking = (options: UseTrackingOptions): TrackingMethods => {
   // Auto-track component lifecycle (desactivado por defecto)
   useEffect(() => {
     if (autoTrack) {
-      // Solo trackear mount si está explícitamente habilitado
+      // Only track mount if explicitly enabled
       track('mount', { lifecycle: 'mount' });
 
       return () => {
@@ -140,8 +140,5 @@ export const useTracking = (options: UseTrackingOptions): TrackingMethods => {
     trackCustom,
   };
 };
-
-// HOC for automatic tracking (opcional - puedes eliminarlo si no lo usas)
-// export const withTracking = ...
 
 export default useTracking;

@@ -3,7 +3,7 @@
 import { Card, Button } from '../../../lib';
 import { ComponentPage } from '../components/ComponentPage';
 import { PropInfo } from '../components/PropsTable';
-import ProtectedRoute from '../../components/ProtectedRoute';
+import { ProtectedRoute, ConditionalTrackingProvider } from '../../components';
 
 // Card component examples
 const CardExamples = () => (
@@ -216,7 +216,9 @@ function CardPageContent() {
 export default function CardPage() {
   return (
     <ProtectedRoute>
-      <CardPageContent />
+      <ConditionalTrackingProvider>
+        <CardPageContent />
+      </ConditionalTrackingProvider>
     </ProtectedRoute>
   );
 }

@@ -11,6 +11,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Form initial values
   const initialValues: LoginFormData = {
@@ -19,20 +20,16 @@ export default function LoginPage() {
   };
 
   // Function to handle form submission
-  const handleSubmit = async (
-    values: LoginFormData,
-    { setFieldError }: any
-  ) => {
+  const handleSubmit = async (values: LoginFormData) => {
     try {
+      setError(null);
       setIsSubmitting(true);
       await login(values.email, values.password);
       router.push('/dashboard');
-    } catch (error) {
-      console.error('Error en login:', error);
-      setFieldError(
-        'password',
-        'Credenciales inválidas. Por favor, verifica tu email y contraseña.'
-      );
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      setError('Error al iniciar sesión: ' + errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -109,16 +106,7 @@ export default function LoginPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="text-sm">
-                    <a
-                      href="#"
-                      className="font-medium text-blue-600 hover:text-blue-500"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </a>
-                  </div>
-                </div>
+                {error && <div className="text-sm text-red-600">{error}</div>}
 
                 <Button
                   type="submit"

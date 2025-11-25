@@ -1,27 +1,27 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Button, Input, Modal } from '../../lib';
-import { trackingAPI } from '../services/tracking.api';
-import { useTrackingStats } from '../contexts/TrackingContext';
+import { Card, Button, Input } from '../../../lib';
+import { trackingAPI } from '../../services/tracking.api';
+import { useTrackingStats } from '../../contexts/TrackingContext';
 
-// Hook de tracking real que envía datos al backend (solo para clicks)
+// Real tracking hook that sends data to backend (clicks only)
 const useClickTracking = (componentName: string, variant?: string) => {
   const { incrementInteraction } = useTrackingStats();
 
   const trackClick = async (metadata?: Record<string, unknown>) => {
     try {
-      // Validar datos antes de enviar
+      // Validate component name and variant
       const validVariant = variant || 'default';
       const validComponentName =
         componentName.replace(/[^a-zA-Z0-9_-]/g, '') || 'unknown';
 
-      // Limpiar metadata para evitar campos que causen errores de validación
+      // Clean metadata to avoid fields that cause validation errors
       const cleanMetadata = {
         ...metadata,
-        // Remover campos que puedan causar problemas
-        action: undefined, // No enviar action en metadata
-        url: undefined, // No enviar URL en metadata
+        // Remove fields that might cause problems
+        action: undefined, // Don't send action in metadata
+        url: undefined, // Don't send URL in metadata
       };
 
       console.log('🎯 Click Tracking (enviando al backend):', {
@@ -32,7 +32,6 @@ const useClickTracking = (componentName: string, variant?: string) => {
         timestamp: new Date().toISOString(),
       });
 
-      // Llamada real al backend
       const response = await trackingAPI.trackComponent({
         componentName: validComponentName,
         variant: validVariant,
@@ -41,7 +40,7 @@ const useClickTracking = (componentName: string, variant?: string) => {
       });
 
       if (response.success) {
-        // Incrementar estadísticas locales inmediatamente
+        // Increment local statistics immediately
         incrementInteraction(validComponentName, 'click');
       } else {
         console.error('❌ Error enviando click tracking:', response.error);
@@ -54,7 +53,7 @@ const useClickTracking = (componentName: string, variant?: string) => {
   return { trackClick };
 };
 
-// Componente Button con tracking integrado
+// Component with click tracking
 const TrackedButton: React.FC<{
   variant?: 'primary' | 'secondary' | 'danger';
   size?: 'sm' | 'md' | 'lg';
@@ -85,7 +84,7 @@ const TrackedButton: React.FC<{
   );
 };
 
-// Componente Input con tracking solo en focus (sin tracking automático)
+// Input component with tracking only on focus (no automatic tracking)
 const TrackedInput: React.FC<{
   label: string;
   placeholder?: string;
@@ -94,10 +93,10 @@ const TrackedInput: React.FC<{
   const { incrementInteraction } = useTrackingStats();
 
   const handleFocus = async () => {
-    // Incrementar estadísticas locales inmediatamente
+    // Increment local statistics immediately
     incrementInteraction('Input', 'focus');
 
-    // También enviar al backend (opcional)
+    // Also send to backend (optional)
     try {
       await trackingAPI.trackComponent({
         componentName: 'Input',
@@ -120,16 +119,16 @@ const TrackedInput: React.FC<{
   );
 };
 
-// Componente Card con tracking integrado
+// Component with focus tracking
 const TrackedCard: React.FC<{
   variant?: 'default' | 'elevated' | 'outlined';
   padding?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
   title?: string;
 }> = ({ variant = 'default', padding = 'md', children, title }) => {
-  // Sin tracking automático - solo renderiza el Card
+  // No automatic tracking - just renders the Card
   const handleFocus = async () => {
-    // También enviar al backend (opcional)
+    // Also send to backend (optional)
     try {
       await trackingAPI.trackComponent({
         componentName: 'Card',
@@ -148,15 +147,15 @@ const TrackedCard: React.FC<{
   );
 };
 
-// Componente Modal con tracking integrado
+// Component with focus tracking
 const TrackedModal: React.FC<{
   size?: 'small' | 'medium' | 'large';
   children: React.ReactNode;
   title?: string;
 }> = ({ size = 'medium', children, title }) => {
-  // Sin tracking automático - solo renderiza el Modal
+  // No automatic tracking - just renders the Modal
   const handleClick = async () => {
-    // También enviar al backend (opcional)
+    // Also send to backend (optional)
     try {
       await trackingAPI.trackComponent({
         componentName: 'Modal',
@@ -175,7 +174,7 @@ const TrackedModal: React.FC<{
   );
 };
 
-// Componente principal de demostración
+// Main demo component
 export const TrackingDemo: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [clickCount, setClickCount] = useState(0);
@@ -206,7 +205,7 @@ export const TrackingDemo: React.FC = () => {
                 variant="primary"
                 onClick={() => setClickCount(c => c + 1)}
               >
-                Botón Primario (Clicks: {clickCount})
+                Botón Primario
               </TrackedButton>
               <TrackedButton variant="secondary">
                 Botón Secundario
@@ -217,7 +216,7 @@ export const TrackingDemo: React.FC = () => {
             </div>
           </div>
 
-          {/* Demostración de Input */}
+          {/* Input with focus tracking */}
           <div className="space-y-4">
             <h4 className="font-semibold text-gray-800">Input con Tracking</h4>
             <TrackedInput

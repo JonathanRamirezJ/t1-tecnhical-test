@@ -139,20 +139,17 @@
       ]
     },
     {
-      "name": "📊 Tracking de Componentes",
+      "name": "📊 Tracking de Componentes (Público)",
+      "description": "Endpoints públicos que no requieren autenticación",
       "item": [
         {
-          "name": "Registrar Tracking - Button Primary",
+          "name": "Registrar Tracking - Button Primary (Público)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{authToken}}"
               }
             ],
             "body": {
@@ -167,17 +164,13 @@
           }
         },
         {
-          "name": "Registrar Tracking - Card Secondary",
+          "name": "Registrar Tracking - Card Secondary (Público)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{authToken}}"
               }
             ],
             "body": {
@@ -192,17 +185,13 @@
           }
         },
         {
-          "name": "Registrar Tracking - Modal Default",
+          "name": "Registrar Tracking - Modal Default (Público)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{authToken}}"
               }
             ],
             "body": {
@@ -217,17 +206,13 @@
           }
         },
         {
-          "name": "Registrar Tracking - Input Focus",
+          "name": "Registrar Tracking - Input Focus (Público)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{authToken}}"
               }
             ],
             "body": {
@@ -244,18 +229,14 @@
       ]
     },
     {
-      "name": "📈 Estadísticas",
+      "name": "📈 Estadísticas (Público)",
+      "description": "Endpoints públicos de estadísticas que no requieren autenticación",
       "item": [
         {
-          "name": "Estadísticas Generales",
+          "name": "Estadísticas Generales (Público)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{authToken}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/components/stats",
               "host": ["{{baseUrl}}"],
@@ -264,15 +245,10 @@
           }
         },
         {
-          "name": "Estadísticas con Filtros",
+          "name": "Estadísticas con Filtros (Público)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{authToken}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/components/stats?componentName=Button&action=click&limit=20",
               "host": ["{{baseUrl}}"],
@@ -295,15 +271,10 @@
           }
         },
         {
-          "name": "Estadísticas por Fechas",
+          "name": "Estadísticas por Fechas (Público)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{authToken}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/components/stats?startDate=2024-11-01&endDate=2024-11-30",
               "host": ["{{baseUrl}}"],
@@ -322,36 +293,14 @@
           }
         },
         {
-          "name": "Estadísticas en Tiempo Real",
+          "name": "Estadísticas en Tiempo Real (Público)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{authToken}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/components/stats/realtime",
               "host": ["{{baseUrl}}"],
               "path": ["api", "components", "stats", "realtime"]
-            }
-          }
-        },
-        {
-          "name": "Detalles de Componente Button",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{authToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/components/Button/details",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "components", "Button", "details"]
             }
           }
         }

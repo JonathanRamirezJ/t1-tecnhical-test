@@ -22,12 +22,11 @@ interface TrackingContextType {
   error: string | null;
   refreshStats: () => Promise<void>;
   exportData: (format: 'csv' | 'json') => Promise<void>;
-  // Funciones para el store local
   incrementInteraction: (componentName: string, action: string) => void;
   getLocalStats: () => LocalTrackingStats;
 }
 
-// Store local para estadísticas en tiempo real
+// Local store for real-time statistics
 interface LocalTrackingStats {
   totalInteractionsToday: number;
   componentInteractions: Record<string, number>;
@@ -63,16 +62,16 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Store local para estadísticas en tiempo real
+  // Local store for real-time statistics
   const [localStats, setLocalStats] = useState<LocalTrackingStats>(() => {
-    // Cargar desde localStorage si existe
+    // Load from localStorage if it exists
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('tracking_local_stats');
       if (saved) {
         try {
           return JSON.parse(saved);
         } catch {
-          // Si hay error al parsear, usar valores por defecto
+          // If there's an error parsing, use default values
         }
       }
     }
@@ -84,9 +83,9 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
     };
   });
 
-  // Función adaptadora eliminada - ahora usamos store local
+  // Adapter function removed - now we use local store
 
-  // fetchRealTimeStats eliminado - ahora usamos store local
+  // fetchRealTimeStats removed - now we use local store
 
   // Fetch general stats
   const fetchStats = async () => {
@@ -96,8 +95,8 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
       if (response.success && response.data) {
         setStats(response.data);
 
-        // SOLUCIÓN AL BUG: Resetear estadísticas locales cuando se cargan del backend
-        // para evitar doble conteo
+        // BUG FIX: Reset local statistics when loading from backend
+        // to avoid double counting
         const resetLocalStats = {
           totalInteractionsToday: 0,
           componentInteractions: {},
@@ -106,7 +105,7 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
         };
         setLocalStats(resetLocalStats);
 
-        // También limpiar localStorage
+        // Also clean localStorage
         if (typeof window !== 'undefined') {
           localStorage.setItem(
             'tracking_local_stats',
@@ -138,31 +137,34 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
     }
   };
 
-  // Export data
+  // Export data - descarga directa desde el backend
   const exportData = async (format: 'csv' | 'json') => {
     try {
       setIsLoading(true);
+      setError(null);
+
+      // Use backend export endpoint that generates and downloads the file directly
       const response = await trackingAPI.exportData({ format });
 
-      if (response.success && response.data?.downloadUrl) {
-        // Create a temporary link to download the file
-        const link = document.createElement('a');
-        link.href = response.data.downloadUrl;
-        link.download = `tracking-data.${format}`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+      if (response.success) {
+        alert(`✅ Archivo ${format.toUpperCase()} descargado exitosamente`);
       } else {
-        setError(response.error || 'Error al exportar datos');
+        setError(
+          response.error ||
+            `Error al exportar datos en formato ${format.toUpperCase()}`
+        );
+        console.error('❌ Error en exportación:', response.error);
       }
     } catch (err) {
-      setError('Error al exportar datos');
+      const errorMessage = `Error al exportar datos en formato ${format.toUpperCase()}`;
+      setError(errorMessage);
+      console.error('❌ Error en exportData:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Funciones del store local
+  // functions for local store
   const incrementInteraction = (componentName: string, action: string) => {
     setLocalStats(prev => {
       const newStats = {
@@ -179,7 +181,7 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
         lastInteraction: new Date().toISOString(),
       };
 
-      // Guardar en localStorage
+      // save to localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('tracking_local_stats', JSON.stringify(newStats));
       }
@@ -192,16 +194,16 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
     return localStats;
   };
 
-  // Combinar stats del backend con stats locales
+  // combine stats from backend and local store
   const getCombinedStats = (): RealTimeStats => {
-    // Calcular total del backend usando la estructura correcta
+    // Calculate backend total using the correct structure
     let backendTotal = 0;
 
-    // Opción 1: Usar summary.totalInteractions si existe
+    // Option 1: Use summary.totalInteractions if it exists
     if (stats?.summary?.totalInteractions) {
       backendTotal = stats.summary.totalInteractions;
     }
-    // Opción 2: Sumar totalInteractions de cada componente en basicStats
+    // Option 2: Sum totalInteractions from each component in basicStats
     else if (stats?.basicStats && Array.isArray(stats.basicStats)) {
       backendTotal = stats.basicStats.reduce(
         (total, component: BackendComponentStats) => {
@@ -214,7 +216,7 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
     const localTotal = localStats.totalInteractionsToday;
     const finalTotal = backendTotal + localTotal;
 
-    // Combinar topComponents del backend con los locales
+    // combine topComponents from backend and local store
     const backendTopComponents = stats?.topComponents || [];
     const localTopComponents = Object.entries(
       localStats.componentInteractions
@@ -224,14 +226,14 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
       lastUsed: localStats.lastInteraction || '',
     }));
 
-    // Merge y ordenar top components
+    // Merge and sort top components
     const allTopComponents = [...backendTopComponents, ...localTopComponents];
     const mergedTopComponents = allTopComponents.reduce(
       (acc, component) => {
         const existing = acc.find(c => c._id === component._id);
         if (existing) {
           existing.count += component.count;
-          // Usar la fecha más reciente
+          // Use the most recent date
           if (component.lastUsed > existing.lastUsed) {
             existing.lastUsed = component.lastUsed;
           }
@@ -288,8 +290,6 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
     incrementInteraction,
     getLocalStats,
   };
-
-  // Función global removida - solo refresh manual para evitar 429 errors
 
   return (
     <TrackingContext.Provider value={value}>

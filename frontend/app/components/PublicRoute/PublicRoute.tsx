@@ -2,21 +2,25 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
-interface ProtectedRouteProps {
+interface PublicRouteProps {
   children: React.ReactNode;
+  redirectTo?: string;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const PublicRoute: React.FC<PublicRouteProps> = ({
+  children,
+  redirectTo = '/dashboard',
+}) => {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login');
+    if (!isLoading && isAuthenticated) {
+      router.push(redirectTo);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, redirectTo]);
 
   if (isLoading) {
     // Show loading spinner while verifying authentication
@@ -24,13 +28,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Verifying authentication...</p>
+          <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
+  if (isAuthenticated) {
     // Show loading while redirecting
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -45,4 +49,4 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-export default ProtectedRoute;
+export default PublicRoute;
