@@ -12,13 +12,8 @@ import TrackingDemo from '../components/TrackingDemo';
 function DashboardContent() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { realTimeStats, isLoading, error, refreshStats, exportData } =
+  const { realTimeStats, isLoading, error, refreshStats, exportData, stats } =
     useTrackingStats();
-
-  // Log para debuggear las estadísticas en el dashboard
-  console.log('🎯 Dashboard - realTimeStats:', realTimeStats);
-  console.log('🎯 Dashboard - isLoading:', isLoading);
-  console.log('🎯 Dashboard - error:', error);
 
   const handleLogout = async () => {
     await logout();
@@ -49,7 +44,7 @@ function DashboardContent() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 my-6">
             <Card variant="elevated" padding="lg">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Bienvenido
@@ -58,9 +53,23 @@ function DashboardContent() {
                 Has iniciado sesión exitosamente. Esta es una página protegida
                 que solo pueden ver los usuarios autenticados.
               </p>
-              <Button variant="primary" size="sm">
-                Ver Perfil
-              </Button>
+            </Card>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card variant="elevated" padding="lg">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Acciones Rápidas
+              </h3>
+              <div className="space-y-3">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => router.push('/components-demo')}
+                >
+                  Ver guia de estilos de componentes
+                </Button>
+              </div>
             </Card>
 
             <Card variant="elevated" padding="lg">
@@ -68,14 +77,6 @@ function DashboardContent() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   📊 Estadísticas de Tracking
                 </h3>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={refreshStats}
-                  disabled={isLoading}
-                >
-                  🔄 Actualizar Estadísticas
-                </Button>
               </div>
               <div className="text-xs text-gray-500 mb-3">
                 💡 Las estadísticas se actualizan manualmente para evitar
@@ -98,39 +99,57 @@ function DashboardContent() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">
-                      Componentes más usados:
-                    </span>
-                    <span className="font-semibold">
-                      {realTimeStats?.topComponentsToday?.[0]?._id || 'N/A'}
+                    <span className="text-gray-600">Componente más usado:</span>
+                    <span className="font-semibold text-blue-300">
+                      {stats?.topComponents?.[0]?._id || 'N/A'}
                     </span>
                   </div>
                 </div>
               )}
+              <div className="flex justify-center mt-4">
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={refreshStats}
+                  disabled={isLoading}
+                >
+                  🔄 Actualizar Estadísticas
+                </Button>
+              </div>
             </Card>
 
             <Card variant="elevated" padding="lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Acciones Rápidas
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                📊 Exportar Datos
               </h3>
-              <div className="space-y-3">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => router.push('/components-demo')}
-                >
-                  Ver Componentes
-                </Button>
-                <Button variant="secondary" size="sm" className="w-full">
-                  Nuevo Proyecto
-                </Button>
-                <Button variant="secondary" size="sm" className="w-full">
-                  Ver Reportes
-                </Button>
-                <Button variant="secondary" size="sm" className="w-full">
-                  Configuración
-                </Button>
+              <div className="space-y-4">
+                <p className="text-gray-600 text-sm">
+                  Exporta las estadísticas de interacciones en diferentes
+                  formatos
+                </p>
+                <div className="space-y-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => exportData('csv')}
+                    disabled={isLoading}
+                  >
+                    📄 Exportar CSV
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => exportData('json')}
+                    disabled={isLoading}
+                  >
+                    📋 Exportar JSON
+                  </Button>
+                </div>
+                <div className="pt-2 border-t text-xs text-gray-500">
+                  Última exportación: Nunca
+                </div>
               </div>
             </Card>
           </div>
@@ -159,49 +178,34 @@ function DashboardContent() {
                     <span className="text-gray-600">
                       Componentes trackeados:
                     </span>
-                    <span className="font-semibold">4</span>
-                  </div>
-                  <div className="pt-2 border-t">
-                    <Button variant="primary" size="sm" className="w-full">
-                      Ver Dashboard Completo
-                    </Button>
+                    <span className="font-semibold text-green-600">4</span>
                   </div>
                 </div>
               </Card>
 
               <Card variant="elevated" padding="lg">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  📊 Exportar Datos
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Componentes trackeados:
                 </h3>
-                <div className="space-y-4">
-                  <p className="text-gray-600 text-sm">
-                    Exporta las estadísticas de interacciones en diferentes
-                    formatos
-                  </p>
-                  <div className="space-y-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => exportData('csv')}
-                      disabled={isLoading}
-                    >
-                      📄 Exportar CSV
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => exportData('json')}
-                      disabled={isLoading}
-                    >
-                      📋 Exportar JSON
-                    </Button>
+                {stats?.basicStats.map(stat => (
+                  <div
+                    className="flex justify-between"
+                    key={stat.componentName}
+                  >
+                    <span className="text-gray-600">{stat.componentName}:</span>
+                    <span className="text-gray-600">
+                      {stat.variants
+                        .map(
+                          variant =>
+                            variant.variant + ' (' + variant.interactions + ')'
+                        )
+                        .join(', ')}
+                    </span>
+                    <span className="font-semibold text-green-600">
+                      {stat.totalInteractions}
+                    </span>
                   </div>
-                  <div className="pt-2 border-t text-xs text-gray-500">
-                    Última exportación: Nunca
-                  </div>
-                </div>
+                ))}
               </Card>
             </div>
           </div>

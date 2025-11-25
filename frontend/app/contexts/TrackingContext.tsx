@@ -91,13 +91,28 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
   // Fetch general stats
   const fetchStats = async () => {
     try {
-      console.log('📊 Obteniendo estadísticas generales...');
       const response = await trackingAPI.getStats();
-      console.log('📊 Respuesta de /stats:', JSON.stringify(response, null, 2));
 
       if (response.success && response.data) {
-        console.log('📊 Datos de stats recibidos:', response.data);
         setStats(response.data);
+
+        // SOLUCIÓN AL BUG: Resetear estadísticas locales cuando se cargan del backend
+        // para evitar doble conteo
+        const resetLocalStats = {
+          totalInteractionsToday: 0,
+          componentInteractions: {},
+          actionInteractions: {},
+          lastInteraction: null,
+        };
+        setLocalStats(resetLocalStats);
+
+        // También limpiar localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(
+            'tracking_local_stats',
+            JSON.stringify(resetLocalStats)
+          );
+        }
       } else {
         console.error('❌ Error en /stats:', response.error);
         setError(response.error || 'Error al obtener estadísticas');
@@ -179,18 +194,12 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
 
   // Combinar stats del backend con stats locales
   const getCombinedStats = (): RealTimeStats => {
-    console.log('🔢 getCombinedStats - Estado actual:');
-    console.log('  - stats completo:', stats);
-    console.log('  - stats?.basicStats:', stats?.basicStats);
-    console.log('  - localStats:', localStats);
-
     // Calcular total del backend usando la estructura correcta
     let backendTotal = 0;
 
     // Opción 1: Usar summary.totalInteractions si existe
     if (stats?.summary?.totalInteractions) {
       backendTotal = stats.summary.totalInteractions;
-      console.log('  - Usando summary.totalInteractions:', backendTotal);
     }
     // Opción 2: Sumar totalInteractions de cada componente en basicStats
     else if (stats?.basicStats && Array.isArray(stats.basicStats)) {
@@ -200,22 +209,10 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
         },
         0
       );
-      console.log('  - Sumando totalInteractions de basicStats:', backendTotal);
-      console.log(
-        '  - Componentes encontrados:',
-        stats.basicStats.map(c => `${c.componentName}: ${c.totalInteractions}`)
-      );
-    } else {
-      console.log('  - No hay datos del backend disponibles');
     }
 
     const localTotal = localStats.totalInteractionsToday;
     const finalTotal = backendTotal + localTotal;
-
-    console.log('🔢 Totales finales:');
-    console.log('  - Backend total:', backendTotal);
-    console.log('  - Local total:', localTotal);
-    console.log('  - Total combinado:', finalTotal);
 
     // Combinar topComponents del backend con los locales
     const backendTopComponents = stats?.topComponents || [];
@@ -256,7 +253,6 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
       interactionsPerHour: [], // Se puede implementar si se necesita
     };
 
-    console.log('📊 Estadísticas combinadas finales:', combinedStats);
     return combinedStats;
   };
 
@@ -278,14 +274,8 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
 
   // Actualizar realTimeStats cuando cambien los stats locales o del backend
   useEffect(() => {
-    console.log('🔄 useEffect: Actualizando realTimeStats...');
-    console.log('  - localStats changed:', localStats);
-    console.log('  - stats changed:', stats);
-
     const combinedStats = getCombinedStats();
     setRealTimeStats(combinedStats);
-
-    console.log('✅ realTimeStats actualizadas:', combinedStats);
   }, [localStats, stats]);
 
   const value: TrackingContextType = {

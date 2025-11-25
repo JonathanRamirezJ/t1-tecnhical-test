@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Button, Input } from '../../lib';
+import { Card, Button, Input, Modal } from '../../lib';
 import { trackingAPI } from '../services/tracking.api';
 import { useTrackingStats } from '../contexts/TrackingContext';
 
@@ -89,9 +89,8 @@ const TrackedButton: React.FC<{
 const TrackedInput: React.FC<{
   label: string;
   placeholder?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}> = ({ label, placeholder, value, onChange }) => {
+  type?: 'text' | 'email' | 'password';
+}> = ({ label, placeholder, type }) => {
   const { incrementInteraction } = useTrackingStats();
 
   const handleFocus = async () => {
@@ -102,9 +101,9 @@ const TrackedInput: React.FC<{
     try {
       await trackingAPI.trackComponent({
         componentName: 'Input',
-        variant: 'default',
+        variant: type === 'text' ? 'default' : type,
         action: 'focus',
-        metadata: { label, valueLength: value.length },
+        metadata: { label },
       });
     } catch (error) {
       console.error('Error enviando focus tracking:', error);
@@ -115,14 +114,13 @@ const TrackedInput: React.FC<{
     <Input
       label={label}
       placeholder={placeholder}
-      value={value}
-      onChange={onChange}
+      type={type}
       onFocus={handleFocus}
     />
   );
 };
 
-// Componente Card sin tracking automático (solo visual)
+// Componente Card con tracking integrado
 const TrackedCard: React.FC<{
   variant?: 'default' | 'elevated' | 'outlined';
   padding?: 'sm' | 'md' | 'lg';
@@ -130,10 +128,50 @@ const TrackedCard: React.FC<{
   title?: string;
 }> = ({ variant = 'default', padding = 'md', children, title }) => {
   // Sin tracking automático - solo renderiza el Card
+  const handleFocus = async () => {
+    // También enviar al backend (opcional)
+    try {
+      await trackingAPI.trackComponent({
+        componentName: 'Card',
+        variant: variant,
+        action: 'focus',
+        metadata: { title },
+      });
+    } catch (error) {
+      console.error('Error enviando focus tracking:', error);
+    }
+  };
   return (
-    <Card variant={variant} padding={padding}>
+    <Card variant={variant} padding={padding} onClick={handleFocus}>
       {children}
     </Card>
+  );
+};
+
+// Componente Modal con tracking integrado
+const TrackedModal: React.FC<{
+  size?: 'small' | 'medium' | 'large';
+  children: React.ReactNode;
+  title?: string;
+}> = ({ size = 'medium', children, title }) => {
+  // Sin tracking automático - solo renderiza el Modal
+  const handleClick = async () => {
+    // También enviar al backend (opcional)
+    try {
+      await trackingAPI.trackComponent({
+        componentName: 'Modal',
+        variant: size,
+        action: 'focus',
+        metadata: { title },
+      });
+    } catch (error) {
+      console.error('Error enviando focus tracking:', error);
+    }
+  };
+  return (
+    <Button variant="primary" size="md" onClick={handleClick}>
+      {children}
+    </Button>
   );
 };
 
@@ -144,7 +182,7 @@ export const TrackingDemo: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <TrackedCard variant="elevated" padding="lg" title="Tracking Demo">
+      <Card variant="elevated" padding="lg">
         <h3 className="text-xl font-semibold text-gray-900 mb-4">
           🎯 Demo del Sistema de Tracking
         </h3>
@@ -154,8 +192,7 @@ export const TrackingDemo: React.FC = () => {
             en los inputs.
           </strong>
           <br />
-          No hay tracking automático al cargar la página. Observa los eventos en
-          la consola del navegador.
+          Observa los eventos en la consola del navegador.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -164,7 +201,7 @@ export const TrackingDemo: React.FC = () => {
             <h4 className="font-semibold text-gray-800">
               Botones con Tracking
             </h4>
-            <div className="space-y-2">
+            <div className="space-y-2 flex flex-col gap-2">
               <TrackedButton
                 variant="primary"
                 onClick={() => setClickCount(c => c + 1)}
@@ -184,73 +221,65 @@ export const TrackingDemo: React.FC = () => {
           <div className="space-y-4">
             <h4 className="font-semibold text-gray-800">Input con Tracking</h4>
             <TrackedInput
-              label="Campo de prueba"
+              label="Campo texto"
               placeholder="Escribe algo aquí..."
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
             />
-            <p className="text-sm text-gray-500">
-              Caracteres: {inputValue.length}
-            </p>
+            <TrackedInput
+              label="Campo password"
+              placeholder="Escribe algo aquí..."
+              type="password"
+            />
+            <TrackedInput
+              label="Campo email"
+              placeholder="Escribe algo aquí..."
+              type="email"
+            />
           </div>
         </div>
 
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">
-          🎨 Showcase de Componentes
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Variantes de Button */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
           <div>
-            <h4 className="font-medium text-gray-800 mb-3">Button Variants</h4>
             <div className="space-y-2">
-              <TrackedButton variant="primary" size="sm">
-                Primary SM
-              </TrackedButton>
-              <TrackedButton variant="secondary" size="md">
-                Secondary MD
-              </TrackedButton>
-              <TrackedButton variant="danger" size="lg">
-                Danger LG
-              </TrackedButton>
-            </div>
-          </div>
-
-          {/* Variantes de Card */}
-          <div>
-            <h4 className="font-medium text-gray-800 mb-3">Card Variants</h4>
-            <div className="space-y-2">
+              <h4 className="font-semibold text-gray-800">Card con Tracking</h4>
               <TrackedCard variant="default" padding="sm" title="Default Card">
-                <p className="text-sm">Default card content</p>
+                <p className="text-sm text-gray-600">
+                  Contenido del card default
+                </p>
+              </TrackedCard>
+              <TrackedCard
+                variant="outlined"
+                padding="sm"
+                title="Outlined Card"
+              >
+                <p className="text-sm text-gray-600">
+                  Contenido del card outlined
+                </p>
               </TrackedCard>
               <TrackedCard
                 variant="elevated"
                 padding="md"
                 title="Elevated Card"
               >
-                <p className="text-sm">Elevated card content</p>
+                <p className="text-sm text-gray-600">
+                  Contenido del card con efecto elevado
+                </p>
               </TrackedCard>
             </div>
           </div>
-
-          {/* Estadísticas en vivo */}
           <div>
-            <h4 className="font-medium text-gray-800 mb-3">Live Stats</h4>
-            <div className="bg-gray-50 p-3 rounded">
-              <div className="text-sm space-y-1">
-                <div className="flex justify-between">
-                  <span>Button clicks:</span>
-                  <span className="font-semibold">{clickCount}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Input chars:</span>
-                  <span className="font-semibold">{inputValue.length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Cards viewed:</span>
-                  <span className="font-semibold">3</span>
-                </div>
-              </div>
+            <div className="space-y-2 flex flex-col gap-2">
+              <h4 className="font-semibold text-gray-800">
+                Modal con Tracking
+              </h4>
+              <TrackedModal size="small" title="Default Card">
+                Botón para abrir modal pequeño
+              </TrackedModal>
+              <TrackedModal size="medium" title="Elevated Card">
+                Botón para abrir modal mediano
+              </TrackedModal>
+              <TrackedModal size="large" title="Elevated Card">
+                Botón para abrir modal grande
+              </TrackedModal>
             </div>
           </div>
         </div>
@@ -270,7 +299,7 @@ export const TrackingDemo: React.FC = () => {
             real.
           </p>
         </div>
-      </TrackedCard>
+      </Card>
     </div>
   );
 };
