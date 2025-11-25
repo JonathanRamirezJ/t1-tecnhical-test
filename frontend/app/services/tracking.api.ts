@@ -97,12 +97,13 @@ export const trackingAPI = {
     event: Omit<TrackingEvent, 'sessionId'>
   ): Promise<ApiResponse<TrackingResponse>> {
     // Limpiar y validar datos antes de enviar
-    const cleanMetadata: Record<string, unknown> = {
-      ...event.metadata,
-      // Solo incluir campos seguros en metadata
-      timestamp: new Date().toISOString(),
-      // No incluir URL ni userAgent para evitar errores de validación
-    };
+    const cleanMetadata: Record<string, string | number | boolean | undefined> =
+      {
+        ...event.metadata,
+        // Solo incluir campos seguros en metadata
+        timestamp: new Date().toISOString(),
+        // No incluir URL ni userAgent para evitar errores de validación
+      };
 
     // Remover campos undefined o null
     Object.keys(cleanMetadata).forEach(key => {
@@ -161,10 +162,10 @@ export const trackingAPI = {
     );
   },
 
-  // Export data
+  // Export data - descarga directa de archivo
   async exportData(
     options: ExportOptions
-  ): Promise<ApiResponse<{ downloadUrl: string }>> {
+  ): Promise<{ success: boolean; error?: string }> {
     const queryParams = new URLSearchParams();
 
     Object.entries(options).forEach(([key, value]) => {
@@ -173,8 +174,73 @@ export const trackingAPI = {
       }
     });
 
-    const endpoint = `/components/export?${queryParams.toString()}`;
-    return trackingApiRequest<{ downloadUrl: string }>(endpoint);
+    const url = `${API_BASE_URL}/components/export?${queryParams.toString()}`;
+
+    try {
+      // Agregar token de autorización
+      const token =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('auth_token')
+          : null;
+      const headers: Record<string, string> = {};
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+      });
+
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: 'Error desconocido' }));
+        return {
+          success: false,
+          error:
+            errorData.message ||
+            `Error ${response.status}: ${response.statusText}`,
+        };
+      }
+
+      // Obtener el nombre del archivo desde los headers
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `tracking-data-${new Date().toISOString().split('T')[0]}.${options.format}`;
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Convertir la respuesta a blob y descargar
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+
+      // Crear elemento de descarga
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      link.style.display = 'none';
+
+      // Agregar al DOM, hacer clic y remover
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Limpiar URL
+      URL.revokeObjectURL(downloadUrl);
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error de red',
+      };
+    }
   },
 
   // Get component details

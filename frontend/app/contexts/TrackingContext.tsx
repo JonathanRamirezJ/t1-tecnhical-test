@@ -14,12 +14,7 @@ import {
   BackendRealTimeStats,
   BackendComponentStats,
 } from '../services/tracking.types';
-import {
-  downloadCSV,
-  downloadJSON,
-  formatTrackingDataForCSV,
-  formatTrackingDataForJSON,
-} from '../utils/downloadUtils';
+// Las utilidades de descarga ya no son necesarias porque el backend maneja la descarga directamente
 
 interface TrackingContextType {
   realTimeStats: RealTimeStats | null;
@@ -144,32 +139,17 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
     }
   };
 
-  // Export data
+  // Export data - descarga directa desde el backend
   const exportData = async (format: 'csv' | 'json') => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Obtener datos de estadísticas del backend (usamos getStats en lugar de exportData)
-      const response = await trackingAPI.getStats();
+      // Usar el endpoint de exportación del backend que genera y descarga el archivo directamente
+      const response = await trackingAPI.exportData({ format });
 
-      if (response.success && response.data) {
-        // Generar nombre de archivo con timestamp
-        const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `tracking-data-${timestamp}.${format}`;
-
-        if (format === 'csv') {
-          // Formatear datos para CSV y descargar
-          const csvData = formatTrackingDataForCSV(response.data);
-          downloadCSV(csvData, filename);
-        } else if (format === 'json') {
-          // Formatear datos para JSON y descargar
-          const jsonData = formatTrackingDataForJSON(
-            response.data,
-            realTimeStats
-          );
-          downloadJSON(jsonData, filename);
-        }
+      if (response.success) {
+        alert(`✅ Archivo ${format.toUpperCase()} descargado exitosamente`);
       } else {
         setError(
           response.error ||
