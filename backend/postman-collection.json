@@ -1,0 +1,443 @@
+{
+  "info": {
+    "name": "T1 Tracking API",
+    "description": "API para sistema de tracking de componentes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🏥 Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "🔐 Autenticación",
+      "item": [
+        {
+          "name": "Registrar Usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', response.token);",
+                  "    console.log('Token guardado:', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuario Prueba\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Test123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Iniciar Sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', response.token);",
+                  "    console.log('Token guardado:', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Test123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Cerrar Sesión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Tracking de Componentes",
+      "item": [
+        {
+          "name": "Registrar Tracking - Button Primary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"componentName\": \"Button\",\n  \"variant\": \"primary\",\n  \"action\": \"click\",\n  \"sessionId\": \"session-123456\",\n  \"metadata\": {\n    \"userAgent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36\",\n    \"screenResolution\": {\n      \"width\": 1920,\n      \"height\": 1080\n    },\n    \"viewport\": {\n      \"width\": 1200,\n      \"height\": 800\n    },\n    \"url\": \"https://example.com/dashboard\",\n    \"referrer\": \"https://google.com\",\n    \"customData\": {\n      \"buttonText\": \"Guardar\",\n      \"formId\": \"user-form\"\n    }\n  },\n  \"performance\": {\n    \"loadTime\": 150,\n    \"renderTime\": 25,\n    \"interactionTime\": 5\n  },\n  \"location\": {\n    \"country\": \"Mexico\",\n    \"region\": \"CDMX\",\n    \"city\": \"Ciudad de México\",\n    \"timezone\": \"America/Mexico_City\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/components/track",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "track"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Tracking - Card Secondary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"componentName\": \"Card\",\n  \"variant\": \"secondary\",\n  \"action\": \"hover\",\n  \"sessionId\": \"session-123456\",\n  \"metadata\": {\n    \"userAgent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36\",\n    \"url\": \"https://example.com/products\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/components/track",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "track"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Tracking - Modal Default",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"componentName\": \"Modal\",\n  \"variant\": \"default\",\n  \"action\": \"load\",\n  \"sessionId\": \"session-789012\",\n  \"metadata\": {\n    \"url\": \"https://example.com/settings\",\n    \"customData\": {\n      \"modalType\": \"confirmation\",\n      \"trigger\": \"delete-button\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/components/track",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "track"]
+            }
+          }
+        },
+        {
+          "name": "Registrar Tracking - Input Focus",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"componentName\": \"Input\",\n  \"variant\": \"text\",\n  \"action\": \"focus\",\n  \"sessionId\": \"session-345678\",\n  \"metadata\": {\n    \"url\": \"https://example.com/contact\",\n    \"customData\": {\n      \"fieldName\": \"email\",\n      \"formStep\": 1\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/components/track",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "track"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📈 Estadísticas",
+      "item": [
+        {
+          "name": "Estadísticas Generales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/components/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Estadísticas con Filtros",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/components/stats?componentName=Button&action=click&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "stats"],
+              "query": [
+                {
+                  "key": "componentName",
+                  "value": "Button"
+                },
+                {
+                  "key": "action",
+                  "value": "click"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Estadísticas por Fechas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/components/stats?startDate=2024-11-01&endDate=2024-11-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "stats"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-11-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-11-30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Estadísticas en Tiempo Real",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/components/stats/realtime",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "stats", "realtime"]
+            }
+          }
+        },
+        {
+          "name": "Detalles de Componente Button",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/components/Button/details",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "Button", "details"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📥 Exportación",
+      "item": [
+        {
+          "name": "Exportar CSV",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/components/export?format=csv",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "export"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "csv"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Exportar JSON",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/components/export?format=json",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "export"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "json"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Exportar con Filtros",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/components/export?format=csv&componentName=Button&startDate=2024-11-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "components", "export"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "csv"
+                },
+                {
+                  "key": "componentName",
+                  "value": "Button"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-11-01"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
