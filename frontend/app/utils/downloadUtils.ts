@@ -5,10 +5,10 @@ import {
 } from '../services/tracking.types';
 
 /**
- * Utilidades para descargar archivos en el frontend
+ * Utils for downloading files in the frontend
  */
 
-// Tipos específicos para exportación
+// Specific types for export functionality
 export interface CSVExportRow {
   Componente: string;
   Variante: string;
@@ -41,7 +41,7 @@ export interface JSONExportData {
 }
 
 /**
- * Convierte datos a formato CSV y los descarga
+ * Converts data to CSV format and downloads it
  */
 export const downloadCSV = (
   data: CSVExportRow[],
@@ -52,7 +52,7 @@ export const downloadCSV = (
     return;
   }
 
-  // Definir el orden de las columnas
+  // Define the order of columns
   const headers: (keyof CSVExportRow)[] = [
     'Componente',
     'Variante',
@@ -62,11 +62,11 @@ export const downloadCSV = (
     'Hora Exportación',
   ];
 
-  // Crear contenido CSV
+  // Create CSV content
   const csvContent = [
     // Headers
     headers.join(','),
-    // Datos
+    // Data
     ...data.map(row =>
       headers
         .map(header => {
@@ -84,13 +84,13 @@ export const downloadCSV = (
     ),
   ].join('\n');
 
-  // Crear blob y descargar
+  // Create blob and download
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   downloadBlob(blob, filename);
 };
 
 /**
- * Convierte datos a formato JSON y los descarga
+ * Converts data to JSON format and downloads it
  */
 export const downloadJSON = (
   data: JSONExportData,
@@ -101,10 +101,10 @@ export const downloadJSON = (
     return;
   }
 
-  // Convertir a JSON con formato bonito
+  // Convert to JSON with pretty formatting
   const jsonContent = JSON.stringify(data, null, 2);
 
-  // Crear blob y descargar
+  // Create blob and download
   const blob = new Blob([jsonContent], {
     type: 'application/json;charset=utf-8;',
   });
@@ -112,7 +112,7 @@ export const downloadJSON = (
 };
 
 /**
- * Descarga un blob como archivo
+ * Downloads a blob as a file
  */
 const downloadBlob = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob);
@@ -122,17 +122,17 @@ const downloadBlob = (blob: Blob, filename: string) => {
   link.download = filename;
   link.style.display = 'none';
 
-  // Agregar al DOM, hacer clic y remover
+  // Add to DOM, click, and remove
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 
-  // Limpiar URL
+  // Clean up URL
   URL.revokeObjectURL(url);
 };
 
 /**
- * Formatea los datos de tracking para exportación CSV
+ * Formats tracking data for CSV export
  */
 export const formatTrackingDataForCSV = (
   stats: TrackingStats
@@ -158,7 +158,7 @@ export const formatTrackingDataForCSV = (
 };
 
 /**
- * Formatea los datos de tracking para exportación JSON
+ * Formats tracking data for JSON export
  */
 export const formatTrackingDataForJSON = (
   stats: TrackingStats,

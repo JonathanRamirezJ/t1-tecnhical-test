@@ -2,7 +2,6 @@ import { ApiResponse } from './api.types';
 import {
   TrackingEvent,
   TrackingStats,
-  RealTimeStats,
   BackendRealTimeStats,
   ExportOptions,
   TrackingResponse,
@@ -126,16 +125,16 @@ export const trackingAPI = {
   async trackComponent(
     event: Omit<TrackingEvent, 'sessionId'>
   ): Promise<ApiResponse<TrackingResponse>> {
-    // Limpiar y validar datos antes de enviar
+    // Clean and validate data before sending
     const cleanMetadata: Record<string, string | number | boolean | undefined> =
       {
         ...event.metadata,
-        // Solo incluir campos seguros en metadata
+        // Only include safe fields in metadata
         timestamp: new Date().toISOString(),
-        // No incluir URL ni userAgent para evitar errores de validación
+        // Don't include URL or userAgent to avoid validation errors
       };
 
-    // Remover campos undefined o null
+    // Remove undefined or null fields
     Object.keys(cleanMetadata).forEach(key => {
       if (cleanMetadata[key] === undefined || cleanMetadata[key] === null) {
         delete cleanMetadata[key];
@@ -192,7 +191,7 @@ export const trackingAPI = {
     );
   },
 
-  // Export data - descarga directa de archivo
+  // Export data - download file from backend
   async exportData(
     options: ExportOptions
   ): Promise<{ success: boolean; error?: string }> {
@@ -207,7 +206,7 @@ export const trackingAPI = {
     const url = `${API_BASE_URL}/components/export?${queryParams.toString()}`;
 
     try {
-      // Agregar token de autorización
+      // Add authorization token
       const token =
         typeof window !== 'undefined'
           ? localStorage.getItem('auth_token')
@@ -235,7 +234,7 @@ export const trackingAPI = {
         };
       }
 
-      // Obtener el nombre del archivo desde los headers
+      // Get filename from headers
       const contentDisposition = response.headers.get('Content-Disposition');
       let filename = `tracking-data-${new Date().toISOString().split('T')[0]}.${options.format}`;
 
@@ -246,22 +245,22 @@ export const trackingAPI = {
         }
       }
 
-      // Convertir la respuesta a blob y descargar
+      // Convert response to blob and download
       const blob = await response.blob();
       const downloadUrl = URL.createObjectURL(blob);
 
-      // Crear elemento de descarga
+      // Create download element
       const link = document.createElement('a');
       link.href = downloadUrl;
       link.download = filename;
       link.style.display = 'none';
 
-      // Agregar al DOM, hacer clic y remover
+      // Add to DOM, click and remove
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
-      // Limpiar URL
+      // Clean URL
       URL.revokeObjectURL(downloadUrl);
 
       return { success: true };

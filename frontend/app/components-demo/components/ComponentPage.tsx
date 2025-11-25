@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Card } from '../../../lib';
+import { Card } from '../../../lib';
 import { CodeBlock } from './CodeBlock';
 import { PropsTable, PropInfo } from './PropsTable';
 import { Sidebar, Header } from '../../components';
@@ -33,12 +33,12 @@ export const ComponentPage: React.FC<ComponentPageProps> = ({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [activeSection, setActiveSection] = useState('components');
 
-  // Manejar el estado inicial del sidebar según el tamaño de pantalla
+  // Handle initial sidebar state based on screen size
   React.useEffect(() => {
     if (isDesktop) {
-      setSidebarCollapsed(false); // Expandir en desktop por defecto
+      setSidebarCollapsed(false); // Expand on desktop by default
     } else {
-      setSidebarCollapsed(true); // Colapsar en móvil por defecto
+      setSidebarCollapsed(true); // Collapse on mobile by default
     }
   }, [isDesktop]);
 

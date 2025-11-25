@@ -15,7 +15,7 @@ import {
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { Card } from '../../../lib';
 
-// Registrar los componentes de Chart.js
+// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -69,7 +69,7 @@ const TrackingCharts: React.FC<TrackingChartsProps> = ({
     );
   }
 
-  // Colores para los gráficos
+  // Colors for charts
   const colors = [
     '#3B82F6', // blue-500
     '#10B981', // green-500
@@ -81,7 +81,7 @@ const TrackingCharts: React.FC<TrackingChartsProps> = ({
     '#84CC16', // lime-500
   ];
 
-  // Datos para el gráfico general de componentes
+  // Data for general components chart
   const overviewData = {
     labels: stats.basicStats.map(stat => stat.componentName),
     datasets: [
@@ -120,7 +120,7 @@ const TrackingCharts: React.FC<TrackingChartsProps> = ({
     },
   };
 
-  // Función para crear datos de gráfico de dona para cada componente
+  // Function to create doughnut chart data for each component
   const createDoughnutData = (
     componentStat: ComponentStat,
     colorIndex: number
@@ -177,7 +177,7 @@ const TrackingCharts: React.FC<TrackingChartsProps> = ({
 
   return (
     <div className="mt-8 space-y-8">
-      {/* Resumen general */}
+      {/* General summary */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card variant="elevated" padding="lg">
           <div className="text-center">
@@ -210,14 +210,14 @@ const TrackingCharts: React.FC<TrackingChartsProps> = ({
         </Card>
       </div>
 
-      {/* Gráfico general de barras */}
+      {/* General bar chart */}
       <Card variant="elevated" padding="lg">
         <div className="h-80">
           <Bar data={overviewData} options={overviewOptions} />
         </div>
       </Card>
 
-      {/* Gráficos individuales por componente */}
+      {/* Individual charts */}
       <div className="space-y-6">
         <h3 className="text-xl font-bold text-gray-900">
           📊 Análisis Detallado por Componente
@@ -247,7 +247,7 @@ const TrackingCharts: React.FC<TrackingChartsProps> = ({
                   />
                 </div>
 
-                {/* Detalles de variantes */}
+                {/* Variant details */}
                 <div className="space-y-2 pt-4 border-t">
                   {componentStat.variants.map((variant, variantIndex) => (
                     <div

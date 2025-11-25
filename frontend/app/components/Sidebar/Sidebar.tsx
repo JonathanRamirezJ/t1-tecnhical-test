@@ -65,12 +65,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeSection,
   onSectionChange,
 }) => {
-  const isMobile = useMediaQuery('(max-width: 1023px)'); // Detectar móvil (antes del lg breakpoint)
+  const isMobile = useMediaQuery('(max-width: 1023px)'); // Detect mobile (before lg breakpoint)
 
   const handleSectionChange = (section: string) => {
     onSectionChange(section);
 
-    // Auto-cerrar sidebar en móvil después de seleccionar una opción
+    // Auto-close sidebar on mobile after selecting an option
     if (isMobile && !isCollapsed) {
       onToggle();
     }
@@ -92,7 +92,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           ${isCollapsed ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'}
         `}
       >
-        {/* Header del sidebar */}
+        {/* Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
           {!isCollapsed && (
             <h2 className="text-lg font-semibold text-gray-900 truncate">
@@ -112,7 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Navegación */}
+        {/* Navigation */}
         <nav className="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
           {menuItems.map(item => {
             const Icon = item.icon;
@@ -147,7 +147,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           })}
         </nav>
 
-        {/* Footer del sidebar */}
+        {/* Footer */}
         <div className="border-t border-gray-200 p-4">
           {!isCollapsed && (
             <div className="text-xs text-gray-500 text-center">

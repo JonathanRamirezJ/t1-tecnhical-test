@@ -28,16 +28,16 @@ function DashboardContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [activeSection, setActiveSection] = useState('home');
 
-  // Manejar el estado inicial del sidebar según el tamaño de pantalla
+  // Handle initial sidebar state based on screen size
   useEffect(() => {
     if (isDesktop) {
-      setSidebarCollapsed(false); // Expandir en desktop por defecto
+      setSidebarCollapsed(false); // Expand on desktop by default
     } else {
-      setSidebarCollapsed(true); // Colapsar en móvil por defecto
+      setSidebarCollapsed(true); // Collapse on mobile by default
     }
   }, [isDesktop]);
 
-  // Manejar parámetros de URL para navegación desde otras páginas
+  // Handle URL parameters for navigation from other pages
   useEffect(() => {
     const section = searchParams.get('section');
     if (
