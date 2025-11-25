@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from '../../../lib';
 import { ComponentPage } from '../components/ComponentPage';
 import { PropInfo } from '../components/PropsTable';
-import ProtectedRoute from '../../components/ProtectedRoute';
+import { ProtectedRoute, ConditionalTrackingProvider } from '../../components';
 
 // Button component examples
 const ButtonExamples = () => (
@@ -154,7 +154,9 @@ function ButtonPageContent() {
 export default function ButtonPage() {
   return (
     <ProtectedRoute>
-      <ButtonPageContent />
+      <ConditionalTrackingProvider>
+        <ButtonPageContent />
+      </ConditionalTrackingProvider>
     </ProtectedRoute>
   );
 }

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Input } from '../../../lib';
 import { ComponentPage } from '../components/ComponentPage';
 import { PropInfo } from '../components/PropsTable';
-import ProtectedRoute from '../../components/ProtectedRoute';
+import { ProtectedRoute, ConditionalTrackingProvider } from '../../components';
 
 // Input component examples
 const InputExamples = () => {
@@ -276,7 +276,9 @@ function InputPageContent() {
 export default function InputPage() {
   return (
     <ProtectedRoute>
-      <InputPageContent />
+      <ConditionalTrackingProvider>
+        <InputPageContent />
+      </ConditionalTrackingProvider>
     </ProtectedRoute>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Button, Input, Modal } from '../../lib';
-import { trackingAPI } from '../services/tracking.api';
-import { useTrackingStats } from '../contexts/TrackingContext';
+import { Card, Button, Input, Modal } from '../../../lib';
+import { trackingAPI } from '../../services/tracking.api';
+import { useTrackingStats } from '../../contexts/TrackingContext';
 
 // Hook de tracking real que envía datos al backend (solo para clicks)
 const useClickTracking = (componentName: string, variant?: string) => {
