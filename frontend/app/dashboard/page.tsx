@@ -4,11 +4,16 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button } from '../../lib';
 import { useAuth } from '../contexts/AuthContext';
+import { useTrackingStats } from '../contexts/TrackingContext';
 import ProtectedRoute from '../components/ProtectedRoute';
+import ConditionalTrackingProvider from '../components/ConditionalTrackingProvider';
+import TrackingDemo from '../components/TrackingDemo';
 
 function DashboardContent() {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { realTimeStats, isLoading, error, refreshStats, exportData } =
+    useTrackingStats();
 
   const handleLogout = async () => {
     await logout();
@@ -54,23 +59,45 @@ function DashboardContent() {
             </Card>
 
             <Card variant="elevated" padding="lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Estadísticas
-              </h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Visitas:</span>
-                  <span className="font-semibold">1,234</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Proyectos:</span>
-                  <span className="font-semibold">12</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tareas:</span>
-                  <span className="font-semibold">45</span>
-                </div>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  📊 Estadísticas en Tiempo Real
+                </h3>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={refreshStats}
+                  disabled={isLoading}
+                >
+                  {isLoading ? '🔄' : '↻'}
+                </Button>
               </div>
+              {error ? (
+                <div className="text-red-600 text-sm">{error}</div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Interacciones hoy:</span>
+                    <span className="font-semibold text-blue-600">
+                      {realTimeStats?.totalInteractionsToday || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Usuarios activos:</span>
+                    <span className="font-semibold text-green-600">
+                      {realTimeStats?.activeUsers || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">
+                      Componentes más usados:
+                    </span>
+                    <span className="font-semibold">
+                      {realTimeStats?.topComponentsToday?.[0]?._id || 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              )}
             </Card>
 
             <Card variant="elevated" padding="lg">
@@ -97,6 +124,77 @@ function DashboardContent() {
                 </Button>
               </div>
             </Card>
+          </div>
+
+          {/* Sistema de Tracking */}
+          <div className="mt-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card variant="elevated" padding="lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  🎯 Sistema de Tracking
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Estado:</span>
+                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                      Activo
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Interacciones hoy:</span>
+                    <span className="font-semibold text-blue-600">
+                      {realTimeStats?.totalInteractionsToday || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">
+                      Componentes trackeados:
+                    </span>
+                    <span className="font-semibold">4</span>
+                  </div>
+                  <div className="pt-2 border-t">
+                    <Button variant="primary" size="sm" className="w-full">
+                      Ver Dashboard Completo
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+
+              <Card variant="elevated" padding="lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  📊 Exportar Datos
+                </h3>
+                <div className="space-y-4">
+                  <p className="text-gray-600 text-sm">
+                    Exporta las estadísticas de interacciones en diferentes
+                    formatos
+                  </p>
+                  <div className="space-y-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => exportData('csv')}
+                      disabled={isLoading}
+                    >
+                      📄 Exportar CSV
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => exportData('json')}
+                      disabled={isLoading}
+                    >
+                      📋 Exportar JSON
+                    </Button>
+                  </div>
+                  <div className="pt-2 border-t text-xs text-gray-500">
+                    Última exportación: Nunca
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
 
           <div className="mt-8">
@@ -129,6 +227,11 @@ function DashboardContent() {
               </div>
             </Card>
           </div>
+
+          {/* Demo del Sistema de Tracking */}
+          <div className="mt-8">
+            <TrackingDemo />
+          </div>
         </div>
       </main>
     </div>
@@ -138,7 +241,9 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
-      <DashboardContent />
+      <ConditionalTrackingProvider>
+        <DashboardContent />
+      </ConditionalTrackingProvider>
     </ProtectedRoute>
   );
 }
