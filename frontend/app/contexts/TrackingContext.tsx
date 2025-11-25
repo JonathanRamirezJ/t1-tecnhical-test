@@ -8,7 +8,12 @@ import React, {
   ReactNode,
 } from 'react';
 import { trackingAPI } from '../services/tracking.api';
-import { RealTimeStats, TrackingStats } from '../services/tracking.types';
+import {
+  RealTimeStats,
+  TrackingStats,
+  BackendRealTimeStats,
+  BackendComponentStats,
+} from '../services/tracking.types';
 
 interface TrackingContextType {
   realTimeStats: RealTimeStats | null;
@@ -17,6 +22,17 @@ interface TrackingContextType {
   error: string | null;
   refreshStats: () => Promise<void>;
   exportData: (format: 'csv' | 'json') => Promise<void>;
+  // Funciones para el store local
+  incrementInteraction: (componentName: string, action: string) => void;
+  getLocalStats: () => LocalTrackingStats;
+}
+
+// Store local para estadísticas en tiempo real
+interface LocalTrackingStats {
+  totalInteractionsToday: number;
+  componentInteractions: Record<string, number>;
+  actionInteractions: Record<string, number>;
+  lastInteraction: string | null;
 }
 
 const TrackingContext = createContext<TrackingContextType | undefined>(
@@ -47,38 +63,47 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch real-time stats
-  const fetchRealTimeStats = async () => {
-    try {
-      console.log('📊 Obteniendo estadísticas en tiempo real...');
-      const response = await trackingAPI.getRealTimeStats();
-      console.log('📊 Respuesta de estadísticas:', response);
-
-      if (response.success && response.data) {
-        setRealTimeStats(response.data);
-        console.log('✅ Estadísticas actualizadas:', response.data);
-      } else {
-        console.error('❌ Error en estadísticas:', response.error);
-        setError(
-          response.error || 'Error al obtener estadísticas en tiempo real'
-        );
+  // Store local para estadísticas en tiempo real
+  const [localStats, setLocalStats] = useState<LocalTrackingStats>(() => {
+    // Cargar desde localStorage si existe
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('tracking_local_stats');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          // Si hay error al parsear, usar valores por defecto
+        }
       }
-    } catch (err) {
-      console.error('❌ Error de conexión:', err);
-      setError('Error de conexión al obtener estadísticas');
     }
-  };
+    return {
+      totalInteractionsToday: 0,
+      componentInteractions: {},
+      actionInteractions: {},
+      lastInteraction: null,
+    };
+  });
+
+  // Función adaptadora eliminada - ahora usamos store local
+
+  // fetchRealTimeStats eliminado - ahora usamos store local
 
   // Fetch general stats
   const fetchStats = async () => {
     try {
+      console.log('📊 Obteniendo estadísticas generales...');
       const response = await trackingAPI.getStats();
+      console.log('📊 Respuesta de /stats:', JSON.stringify(response, null, 2));
+
       if (response.success && response.data) {
+        console.log('📊 Datos de stats recibidos:', response.data);
         setStats(response.data);
       } else {
+        console.error('❌ Error en /stats:', response.error);
         setError(response.error || 'Error al obtener estadísticas');
       }
     } catch (err) {
+      console.error('❌ Error de conexión en /stats:', err);
       setError('Error de conexión al obtener estadísticas');
     }
   };
@@ -89,7 +114,8 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
     setError(null);
 
     try {
-      await Promise.all([fetchRealTimeStats(), fetchStats()]);
+      // Solo llamar a /stats, no a /realtime para evitar 429 errors
+      await fetchStats();
     } catch (err) {
       setError('Error al actualizar estadísticas');
     } finally {
@@ -121,7 +147,120 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
     }
   };
 
-  // Auto-refresh real-time stats every 30 seconds (only if user is authenticated)
+  // Funciones del store local
+  const incrementInteraction = (componentName: string, action: string) => {
+    setLocalStats(prev => {
+      const newStats = {
+        ...prev,
+        totalInteractionsToday: prev.totalInteractionsToday + 1,
+        componentInteractions: {
+          ...prev.componentInteractions,
+          [componentName]: (prev.componentInteractions[componentName] || 0) + 1,
+        },
+        actionInteractions: {
+          ...prev.actionInteractions,
+          [action]: (prev.actionInteractions[action] || 0) + 1,
+        },
+        lastInteraction: new Date().toISOString(),
+      };
+
+      // Guardar en localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('tracking_local_stats', JSON.stringify(newStats));
+      }
+
+      return newStats;
+    });
+  };
+
+  const getLocalStats = (): LocalTrackingStats => {
+    return localStats;
+  };
+
+  // Combinar stats del backend con stats locales
+  const getCombinedStats = (): RealTimeStats => {
+    console.log('🔢 getCombinedStats - Estado actual:');
+    console.log('  - stats completo:', stats);
+    console.log('  - stats?.basicStats:', stats?.basicStats);
+    console.log('  - localStats:', localStats);
+
+    // Calcular total del backend usando la estructura correcta
+    let backendTotal = 0;
+
+    // Opción 1: Usar summary.totalInteractions si existe
+    if (stats?.summary?.totalInteractions) {
+      backendTotal = stats.summary.totalInteractions;
+      console.log('  - Usando summary.totalInteractions:', backendTotal);
+    }
+    // Opción 2: Sumar totalInteractions de cada componente en basicStats
+    else if (stats?.basicStats && Array.isArray(stats.basicStats)) {
+      backendTotal = stats.basicStats.reduce(
+        (total, component: BackendComponentStats) => {
+          return total + (component.totalInteractions || 0);
+        },
+        0
+      );
+      console.log('  - Sumando totalInteractions de basicStats:', backendTotal);
+      console.log(
+        '  - Componentes encontrados:',
+        stats.basicStats.map(c => `${c.componentName}: ${c.totalInteractions}`)
+      );
+    } else {
+      console.log('  - No hay datos del backend disponibles');
+    }
+
+    const localTotal = localStats.totalInteractionsToday;
+    const finalTotal = backendTotal + localTotal;
+
+    console.log('🔢 Totales finales:');
+    console.log('  - Backend total:', backendTotal);
+    console.log('  - Local total:', localTotal);
+    console.log('  - Total combinado:', finalTotal);
+
+    // Combinar topComponents del backend con los locales
+    const backendTopComponents = stats?.topComponents || [];
+    const localTopComponents = Object.entries(
+      localStats.componentInteractions
+    ).map(([name, count]) => ({
+      _id: name,
+      count,
+      lastUsed: localStats.lastInteraction || '',
+    }));
+
+    // Merge y ordenar top components
+    const allTopComponents = [...backendTopComponents, ...localTopComponents];
+    const mergedTopComponents = allTopComponents.reduce(
+      (acc, component) => {
+        const existing = acc.find(c => c._id === component._id);
+        if (existing) {
+          existing.count += component.count;
+          // Usar la fecha más reciente
+          if (component.lastUsed > existing.lastUsed) {
+            existing.lastUsed = component.lastUsed;
+          }
+        } else {
+          acc.push({ ...component });
+        }
+        return acc;
+      },
+      [] as typeof backendTopComponents
+    );
+
+    const combinedStats = {
+      totalInteractionsToday: finalTotal,
+      activeUsers: 1, // Usuario actual
+      topComponentsToday: mergedTopComponents
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5),
+      recentInteractions: stats?.recentInteractions || [],
+      interactionsPerHour: [], // Se puede implementar si se necesita
+    };
+
+    console.log('📊 Estadísticas combinadas finales:', combinedStats);
+    return combinedStats;
+  };
+
+  // Load initial stats (only if user is authenticated) - NO auto-refresh to avoid 429 errors
   useEffect(() => {
     // Check if user is authenticated before making calls
     const token =
@@ -133,25 +272,21 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
       return;
     }
 
-    console.log('🔑 Usuario autenticado - cargando estadísticas de tracking');
-
-    // Initial load
+    // Initial load only - no automatic refresh to prevent 429 errors
     refreshStats();
-
-    // Set up interval for real-time updates
-    const interval = setInterval(() => {
-      // Check token again before each update
-      const currentToken =
-        typeof window !== 'undefined'
-          ? localStorage.getItem('auth_token')
-          : null;
-      if (currentToken) {
-        fetchRealTimeStats();
-      }
-    }, 30000); // 30 seconds
-
-    return () => clearInterval(interval);
   }, []);
+
+  // Actualizar realTimeStats cuando cambien los stats locales o del backend
+  useEffect(() => {
+    console.log('🔄 useEffect: Actualizando realTimeStats...');
+    console.log('  - localStats changed:', localStats);
+    console.log('  - stats changed:', stats);
+
+    const combinedStats = getCombinedStats();
+    setRealTimeStats(combinedStats);
+
+    console.log('✅ realTimeStats actualizadas:', combinedStats);
+  }, [localStats, stats]);
 
   const value: TrackingContextType = {
     realTimeStats,
@@ -160,7 +295,11 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
     error,
     refreshStats,
     exportData,
+    incrementInteraction,
+    getLocalStats,
   };
+
+  // Función global removida - solo refresh manual para evitar 429 errors
 
   return (
     <TrackingContext.Provider value={value}>

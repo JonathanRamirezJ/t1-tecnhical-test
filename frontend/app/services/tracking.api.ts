@@ -3,7 +3,9 @@ import {
   TrackingEvent,
   TrackingStats,
   RealTimeStats,
+  BackendRealTimeStats,
   ExportOptions,
+  TrackingResponse,
 } from './tracking.types';
 
 // API configuration
@@ -26,10 +28,6 @@ async function trackingApiRequest<T>(
     typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
   if (token) {
     defaultHeaders['Authorization'] = `Bearer ${token}`;
-    console.log(
-      '🔑 Token agregado a petición de tracking:',
-      token.substring(0, 20) + '...'
-    );
   } else {
     console.warn(
       '⚠️ No hay token disponible para tracking - usuario no autenticado'
@@ -45,16 +43,10 @@ async function trackingApiRequest<T>(
   };
 
   try {
-    console.log('🌐 Enviando petición a:', url);
-    console.log('📤 Config de petición:', config);
-
     const response = await fetch(url, config);
     const data = await response.json();
 
-    console.log('📥 Respuesta recibida:', { status: response.status, data });
-
     if (!response.ok) {
-      console.error('❌ Error HTTP:', response.status, data);
       return {
         success: false,
         error: data.message || `HTTP error! status: ${response.status}`,
@@ -62,21 +54,18 @@ async function trackingApiRequest<T>(
     }
 
     if (data.status === 'success') {
-      console.log('✅ Petición exitosa:', data);
       return {
         success: true,
         data: data.data || data,
         message: data.message,
       };
     } else {
-      console.error('❌ Error en respuesta:', data);
       return {
         success: false,
         error: data.message || 'Error desconocido',
       };
     }
   } catch (error) {
-    console.error('❌ Error de red:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Network error',
@@ -106,16 +95,28 @@ export const trackingAPI = {
   // Track component interaction
   async trackComponent(
     event: Omit<TrackingEvent, 'sessionId'>
-  ): Promise<ApiResponse<any>> {
+  ): Promise<ApiResponse<TrackingResponse>> {
+    // Limpiar y validar datos antes de enviar
+    const cleanMetadata: Record<string, unknown> = {
+      ...event.metadata,
+      // Solo incluir campos seguros en metadata
+      timestamp: new Date().toISOString(),
+      // No incluir URL ni userAgent para evitar errores de validación
+    };
+
+    // Remover campos undefined o null
+    Object.keys(cleanMetadata).forEach(key => {
+      if (cleanMetadata[key] === undefined || cleanMetadata[key] === null) {
+        delete cleanMetadata[key];
+      }
+    });
+
     const trackingEvent: TrackingEvent = {
-      ...event,
+      componentName: event.componentName,
+      variant: event.variant || 'default',
+      action: event.action,
       sessionId: getSessionId(),
-      metadata: {
-        ...event.metadata,
-        url: typeof window !== 'undefined' ? window.location.href : '',
-        userAgent: typeof window !== 'undefined' ? navigator.userAgent : '',
-        timestamp: new Date().toISOString(),
-      },
+      metadata: cleanMetadata,
       location: {
         pathname: typeof window !== 'undefined' ? window.location.pathname : '',
         search: typeof window !== 'undefined' ? window.location.search : '',
@@ -123,7 +124,7 @@ export const trackingAPI = {
       },
     };
 
-    return trackingApiRequest<any>('/components/track', {
+    return trackingApiRequest<TrackingResponse>('/components/track', {
       method: 'POST',
       body: JSON.stringify(trackingEvent),
     });
@@ -154,8 +155,10 @@ export const trackingAPI = {
   },
 
   // Get real-time statistics
-  async getRealTimeStats(): Promise<ApiResponse<RealTimeStats>> {
-    return trackingApiRequest<RealTimeStats>('/components/stats/realtime');
+  async getRealTimeStats(): Promise<ApiResponse<BackendRealTimeStats>> {
+    return trackingApiRequest<BackendRealTimeStats>(
+      '/components/stats/realtime'
+    );
   },
 
   // Export data

@@ -15,6 +15,11 @@ function DashboardContent() {
   const { realTimeStats, isLoading, error, refreshStats, exportData } =
     useTrackingStats();
 
+  // Log para debuggear las estadísticas en el dashboard
+  console.log('🎯 Dashboard - realTimeStats:', realTimeStats);
+  console.log('🎯 Dashboard - isLoading:', isLoading);
+  console.log('🎯 Dashboard - error:', error);
+
   const handleLogout = async () => {
     await logout();
     router.push('/login');
@@ -61,7 +66,7 @@ function DashboardContent() {
             <Card variant="elevated" padding="lg">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  📊 Estadísticas en Tiempo Real
+                  📊 Estadísticas de Tracking
                 </h3>
                 <Button
                   variant="secondary"
@@ -69,8 +74,12 @@ function DashboardContent() {
                   onClick={refreshStats}
                   disabled={isLoading}
                 >
-                  {isLoading ? '🔄' : '↻'}
+                  🔄 Actualizar Estadísticas
                 </Button>
+              </div>
+              <div className="text-xs text-gray-500 mb-3">
+                💡 Las estadísticas se actualizan manualmente para evitar
+                sobrecarga del servidor
               </div>
               {error ? (
                 <div className="text-red-600 text-sm">{error}</div>
@@ -195,37 +204,6 @@ function DashboardContent() {
                 </div>
               </Card>
             </div>
-          </div>
-
-          <div className="mt-8">
-            <Card variant="outlined" padding="lg">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Actividad Reciente
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-gray-700">
-                    Proyecto "Website Redesign" completado
-                  </span>
-                  <span className="text-sm text-gray-500">hace 2 horas</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-gray-700">
-                    Nueva tarea asignada: "Revisar documentación"
-                  </span>
-                  <span className="text-sm text-gray-500">hace 4 horas</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                  <span className="text-gray-700">
-                    Reunión programada para mañana
-                  </span>
-                  <span className="text-sm text-gray-500">hace 1 día</span>
-                </div>
-              </div>
-            </Card>
           </div>
 
           {/* Demo del Sistema de Tracking */}

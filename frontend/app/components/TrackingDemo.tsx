@@ -3,20 +3,32 @@
 import React, { useState } from 'react';
 import { Card, Button, Input } from '../../lib';
 import { trackingAPI } from '../services/tracking.api';
+import { useTrackingStats } from '../contexts/TrackingContext';
 
 // Hook de tracking real que envía datos al backend (solo para clicks)
 const useClickTracking = (componentName: string, variant?: string) => {
-  const trackClick = async (metadata?: any) => {
+  const { incrementInteraction } = useTrackingStats();
+
+  const trackClick = async (metadata?: Record<string, unknown>) => {
     try {
       // Validar datos antes de enviar
       const validVariant = variant || 'default';
-      const validComponentName = componentName.replace(/[^a-zA-Z0-9_-]/g, '');
+      const validComponentName =
+        componentName.replace(/[^a-zA-Z0-9_-]/g, '') || 'unknown';
+
+      // Limpiar metadata para evitar campos que causen errores de validación
+      const cleanMetadata = {
+        ...metadata,
+        // Remover campos que puedan causar problemas
+        action: undefined, // No enviar action en metadata
+        url: undefined, // No enviar URL en metadata
+      };
 
       console.log('🎯 Click Tracking (enviando al backend):', {
         componentName: validComponentName,
         variant: validVariant,
         action: 'click',
-        metadata,
+        metadata: cleanMetadata,
         timestamp: new Date().toISOString(),
       });
 
@@ -25,11 +37,12 @@ const useClickTracking = (componentName: string, variant?: string) => {
         componentName: validComponentName,
         variant: validVariant,
         action: 'click',
-        metadata,
+        metadata: cleanMetadata,
       });
 
       if (response.success) {
-        console.log('✅ Click tracking enviado exitosamente:', response.data);
+        // Incrementar estadísticas locales inmediatamente
+        incrementInteraction(validComponentName, 'click');
       } else {
         console.error('❌ Error enviando click tracking:', response.error);
       }
@@ -79,14 +92,23 @@ const TrackedInput: React.FC<{
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }> = ({ label, placeholder, value, onChange }) => {
-  const { trackClick } = useClickTracking('Input', 'default');
+  const { incrementInteraction } = useTrackingStats();
 
   const handleFocus = async () => {
-    await trackClick({
-      label,
-      action: 'focus',
-      valueLength: value.length,
-    });
+    // Incrementar estadísticas locales inmediatamente
+    incrementInteraction('Input', 'focus');
+
+    // También enviar al backend (opcional)
+    try {
+      await trackingAPI.trackComponent({
+        componentName: 'Input',
+        variant: 'default',
+        action: 'focus',
+        metadata: { label, valueLength: value.length },
+      });
+    } catch (error) {
+      console.error('Error enviando focus tracking:', error);
+    }
   };
 
   return (
@@ -173,25 +195,6 @@ export const TrackingDemo: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h5 className="font-semibold text-blue-900 mb-2">
-            📊 Eventos Trackeados:
-          </h5>
-          <p className="text-blue-800 text-sm">
-            <strong>Solo se envían eventos cuando interactúas:</strong>
-            <br />
-            • Clicks en botones → Evento 'click'
-            <br />
-            • Focus en inputs → Evento 'focus'
-            <br />
-            Abre la consola del navegador (F12) para ver los eventos en tiempo
-            real.
-          </p>
-        </div>
-      </TrackedCard>
-
-      {/* Showcase de variantes */}
-      <TrackedCard variant="outlined" padding="lg" title="Component Showcase">
         <h3 className="text-xl font-semibold text-gray-900 mb-4">
           🎨 Showcase de Componentes
         </h3>
@@ -250,6 +253,22 @@ export const TrackingDemo: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+          <h5 className="font-semibold text-blue-900 mb-2">
+            📊 Eventos Trackeados:
+          </h5>
+          <p className="text-blue-800 text-sm">
+            <strong>Solo se envían eventos cuando interactúas:</strong>
+            <br />
+            • Clicks en botones → Evento 'click'
+            <br />
+            • Focus en inputs → Evento 'focus'
+            <br />
+            Abre la consola del navegador (F12) para ver los eventos en tiempo
+            real.
+          </p>
         </div>
       </TrackedCard>
     </div>

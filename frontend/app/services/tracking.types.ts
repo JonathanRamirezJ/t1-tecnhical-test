@@ -25,14 +25,32 @@ export interface TrackingEvent {
 }
 
 export interface TrackingStats {
-  totalInteractions: number;
-  totalPages: number;
-  currentPage: number;
-  basicStats: ComponentStats[];
+  summary: {
+    totalInteractions: number;
+    totalPages: number;
+    currentPage: number;
+    resultsPerPage: number;
+  };
+  basicStats: BackendComponentStats[];
   dailyStats: DailyStats[];
   recentInteractions: RecentInteraction[];
   topComponents: TopComponent[];
   topActions: TopAction[];
+}
+
+export interface BackendComponentStats {
+  totalInteractions: number;
+  componentName: string;
+  variants: Array<{
+    variant: string;
+    interactions: number;
+    actions: Array<{
+      action: string;
+      count: number;
+    }>;
+    lastUsed: string;
+    firstUsed: string;
+  }>;
 }
 
 export interface ComponentStats {
@@ -70,6 +88,34 @@ export interface TopAction {
   count: number;
 }
 
+// Estructura que devuelve el backend para estadísticas en tiempo real
+export interface BackendRealTimeStats {
+  realTime: {
+    lastHour: {
+      totalInteractions: number;
+      uniqueComponents: number;
+      uniqueSessions: number;
+    };
+    lastDay: {
+      totalInteractions: number;
+      uniqueComponents: number;
+      uniqueSessions: number;
+    };
+    minutelyActivity: Array<{
+      _id: {
+        year: number;
+        month: number;
+        day: number;
+        hour: number;
+        minute: number;
+      };
+      count: number;
+    }>;
+  };
+  timestamp: string;
+}
+
+// Estructura que usa el frontend (adaptada)
 export interface RealTimeStats {
   totalInteractionsToday: number;
   activeUsers: number;
@@ -88,4 +134,14 @@ export interface ExportOptions {
   componentName?: string;
   variant?: string;
   action?: string;
+}
+
+export interface TrackingResponse {
+  tracking: {
+    id: string;
+    componentName: string;
+    variant: string;
+    action: string;
+    timestamp: string;
+  };
 }
