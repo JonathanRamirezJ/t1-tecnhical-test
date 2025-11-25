@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Button } from '../../../lib';
 import {
   DocumentArrowDownIcon,
@@ -9,14 +9,28 @@ import {
 } from '@heroicons/react/24/outline';
 
 interface ExportSectionProps {
-  exportData: (format: 'csv' | 'json') => void;
+  exportData: (format: 'csv' | 'json') => Promise<void>;
   isLoading: boolean;
+  error?: string | null;
 }
 
 const ExportSection: React.FC<ExportSectionProps> = ({
   exportData,
   isLoading,
+  error,
 }) => {
+  const [loadingFormat, setLoadingFormat] = useState<string | null>(null);
+
+  const handleExport = async (format: 'csv' | 'json') => {
+    try {
+      setLoadingFormat(format);
+      await exportData(format);
+    } catch (error) {
+      console.error('Error en exportación:', error);
+    } finally {
+      setLoadingFormat(null);
+    }
+  };
   const exportOptions = [
     {
       format: 'csv',
@@ -49,6 +63,16 @@ const ExportSection: React.FC<ExportSectionProps> = ({
         </div>
       </Card>
 
+      {/* Error message */}
+      {error && (
+        <Card variant="outlined" padding="lg">
+          <div className="text-center text-red-600">
+            <p className="font-medium">❌ Error en la exportación</p>
+            <p className="text-sm mt-1">{error}</p>
+          </div>
+        </Card>
+      )}
+
       {/* Opciones de exportación */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {exportOptions.map(option => {
@@ -75,11 +99,11 @@ const ExportSection: React.FC<ExportSectionProps> = ({
                   variant={option.color === 'green' ? 'secondary' : 'primary'}
                   size="md"
                   className="w-full"
-                  onClick={() => exportData(option.format as 'csv' | 'json')}
-                  disabled={isLoading}
+                  onClick={() => handleExport(option.format as 'csv' | 'json')}
+                  disabled={isLoading || loadingFormat !== null}
                 >
-                  {isLoading
-                    ? '⏳ Procesando...'
+                  {loadingFormat === option.format
+                    ? '⏳ Descargando...'
                     : `📄 Descargar ${option.format.toUpperCase()}`}
                 </Button>
               </div>

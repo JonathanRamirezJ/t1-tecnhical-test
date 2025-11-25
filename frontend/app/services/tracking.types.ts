@@ -10,7 +10,7 @@ export interface TrackingEvent {
     timestamp?: string;
     elementId?: string;
     elementText?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | undefined;
   };
   performance?: {
     loadTime?: number;

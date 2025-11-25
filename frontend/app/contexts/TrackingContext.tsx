@@ -14,6 +14,12 @@ import {
   BackendRealTimeStats,
   BackendComponentStats,
 } from '../services/tracking.types';
+import {
+  downloadCSV,
+  downloadJSON,
+  formatTrackingDataForCSV,
+  formatTrackingDataForJSON,
+} from '../utils/downloadUtils';
 
 interface TrackingContextType {
   realTimeStats: RealTimeStats | null;
@@ -142,21 +148,39 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({
   const exportData = async (format: 'csv' | 'json') => {
     try {
       setIsLoading(true);
-      const response = await trackingAPI.exportData({ format });
+      setError(null);
 
-      if (response.success && response.data?.downloadUrl) {
-        // Create a temporary link to download the file
-        const link = document.createElement('a');
-        link.href = response.data.downloadUrl;
-        link.download = `tracking-data.${format}`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+      // Obtener datos de estadísticas del backend (usamos getStats en lugar de exportData)
+      const response = await trackingAPI.getStats();
+
+      if (response.success && response.data) {
+        // Generar nombre de archivo con timestamp
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = `tracking-data-${timestamp}.${format}`;
+
+        if (format === 'csv') {
+          // Formatear datos para CSV y descargar
+          const csvData = formatTrackingDataForCSV(response.data);
+          downloadCSV(csvData, filename);
+        } else if (format === 'json') {
+          // Formatear datos para JSON y descargar
+          const jsonData = formatTrackingDataForJSON(
+            response.data,
+            realTimeStats
+          );
+          downloadJSON(jsonData, filename);
+        }
       } else {
-        setError(response.error || 'Error al exportar datos');
+        setError(
+          response.error ||
+            `Error al exportar datos en formato ${format.toUpperCase()}`
+        );
+        console.error('❌ Error en exportación:', response.error);
       }
     } catch (err) {
-      setError('Error al exportar datos');
+      const errorMessage = `Error al exportar datos en formato ${format.toUpperCase()}`;
+      setError(errorMessage);
+      console.error('❌ Error en exportData:', err);
     } finally {
       setIsLoading(false);
     }

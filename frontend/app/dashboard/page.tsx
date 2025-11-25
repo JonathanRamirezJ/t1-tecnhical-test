@@ -73,7 +73,13 @@ function DashboardContent() {
           />
         );
       case 'export':
-        return <ExportSection exportData={exportData} isLoading={isLoading} />;
+        return (
+          <ExportSection
+            exportData={exportData}
+            isLoading={isLoading}
+            error={error}
+          />
+        );
       default:
         return (
           <HomeSection

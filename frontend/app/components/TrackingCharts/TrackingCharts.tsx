@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
   ArcElement,
+  TooltipItem,
 } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { Card } from '../../../lib';
@@ -158,7 +159,7 @@ const TrackingCharts: React.FC<TrackingChartsProps> = ({
       },
       tooltip: {
         callbacks: {
-          label: function (context: any) {
+          label: function (context: TooltipItem<'doughnut'>) {
             const label = context.label || '';
             const value = context.parsed;
             const total = context.dataset.data.reduce(
